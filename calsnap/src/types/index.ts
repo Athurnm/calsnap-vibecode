@@ -1,7 +1,7 @@
 export interface CalendarEvent {
     activity: string;
     date: string; // YYYY-MM-DD
-    startTime: string; // HH:MM (24h)
+    startTime: string | null; // HH:MM (24h) or null for all-day events
     endTime: string | null; // HH:MM (24h) or null
     location?: string;
     notes?: string;
