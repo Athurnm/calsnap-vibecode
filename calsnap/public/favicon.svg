@@ -1,0 +1,14 @@
+<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Calendar Body -->
+  <rect x="32" y="32" width="192" height="192" rx="32" fill="white" stroke="#3B82F6" stroke-width="16"/>
+  
+  <!-- Calendar Header -->
+  <path d="M32 64C32 46.3269 46.3269 32 64 32H192C209.673 32 224 46.3269 224 64V80H32V64Z" fill="#3B82F6"/>
+  
+  <!-- Camera Lens / Snap Element -->
+  <circle cx="128" cy="144" r="48" stroke="#3B82F6" stroke-width="12" fill="none" opacity="0.2"/>
+  <circle cx="128" cy="144" r="24" fill="#3B82F6"/>
+  
+  <!-- Lightning Bolt (Accent Green) -->
+  <path d="M160 112L120 112L136 88L96 144L128 144L112 176L160 112Z" fill="#10B981" stroke="white" stroke-width="4" stroke-linejoin="round"/>
+</svg>
