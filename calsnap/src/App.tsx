@@ -2,11 +2,13 @@ import { useState, useEffect } from 'react';
 import { useLanguage } from './context/LanguageContextCore';
 import { LanguageToggle } from './components/LanguageToggle';
 import { UploadZone } from './components/UploadZone';
+import { InputMethodToggle } from './components/InputMethodToggle';
+import { TextInputZone } from './components/TextInputZone';
 import { ProcessingState } from './components/ProcessingState';
 import { ResultsTable } from './components/ResultsTable';
 import { ActivityLog } from './components/ActivityLog';
 import { logger } from './lib/logger';
-import { analyzeScheduleImage, MODEL_OPTIONS } from './lib/llm';
+import { analyzeScheduleImage, analyzeScheduleText, MODEL_OPTIONS } from './lib/llm';
 import type { ModelOption } from './lib/llm';
 import { storage } from './lib/storage';
 import { generateIcsFile } from './lib/export';
@@ -17,6 +19,7 @@ import { Info, HelpCircle, ChevronDown, ChevronUp, Download } from 'lucide-react
 function App() {
   const { t } = useLanguage();
   const [appState, setAppState] = useState<'upload' | 'processing' | 'results'>('upload');
+  const [inputMethod, setInputMethod] = useState<'image' | 'text'>('image');
   const [processingStatus, setProcessingStatus] = useState<'uploading' | 'analyzing' | 'extracting'>('analyzing');
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -67,6 +70,27 @@ function App() {
     } catch (err) {
       console.error(err);
       const errorMessage = err instanceof Error ? err.message : 'Failed to process image';
+      setError(errorMessage);
+      logger.error(errorMessage);
+      setAppState('upload');
+    }
+  };
+
+  const handleTextAnalyze = async (text: string) => {
+    setAppState('processing');
+    setProcessingStatus('analyzing');
+
+    try {
+      const apiKey = import.meta.env.VITE_OPENROUTER_API_KEY;
+      if (!apiKey) throw new Error('API Configuration Error: No API key found.');
+
+      const extractedEvents = await analyzeScheduleText(text, apiKey, selectedModel);
+      storage.saveEvents(extractedEvents);
+      setEvents(extractedEvents);
+      setAppState('results');
+    } catch (err) {
+      console.error(err);
+      const errorMessage = err instanceof Error ? err.message : 'Failed to analyze text';
       setError(errorMessage);
       logger.error(errorMessage);
       setAppState('upload');
@@ -200,11 +224,28 @@ function App() {
                 </div>
               </div>
 
-              <UploadZone
-                onFileSelect={handleFileSelect}
-                isProcessing={false}
-                error={error || undefined}
+              <InputMethodToggle
+                method={inputMethod}
+                onChange={(method) => {
+                  setInputMethod(method);
+                  if (method === 'text') {
+                    setSelectedModel('google');
+                  }
+                }}
               />
+
+              {inputMethod === 'image' ? (
+                <UploadZone
+                  onFileSelect={handleFileSelect}
+                  isProcessing={false}
+                  error={error || undefined}
+                />
+              ) : (
+                <TextInputZone
+                  onAnalyze={handleTextAnalyze}
+                  isProcessing={false}
+                />
+              )}
             </div>
           )}
 
@@ -296,11 +337,11 @@ function App() {
         </main>
 
         <footer className="mt-12 text-center text-sm text-gray-400 pb-8">
-          <p className="mb-2">
-            {t('footer.copyright')}
-            <span className="mx-2 opacity-50">|</span>
-            Built with ❤️ by <a href="https://github.com/Athurnm" target="_blank" rel="noopener noreferrer" className="hover:text-blue-500 transition-colors">Athurnm</a>
-          </p>
+          <div className="mb-2 flex flex-col md:flex-row justify-center items-center gap-1 md:gap-0">
+            <span>{t('footer.copyright')}</span>
+            <span className="hidden md:inline mx-2 opacity-50">|</span>
+            <span>Built with ❤️ by <a href="https://github.com/Athurnm" target="_blank" rel="noopener noreferrer" className="hover:text-blue-500 transition-colors">Athurnm</a></span>
+          </div>
           <p className="text-xs text-gray-300">No personal data is stored on our servers.</p>
         </footer>
       </div>

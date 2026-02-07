@@ -52,9 +52,15 @@ export const translations = {
         'model.title': 'AI Model',
         'model.tooltip.title': 'Which model to choose?',
         'model.tooltip.qwen': 'Qwen 2.5 VL: More accurate for complex layouts.',
-        'model.tooltip.gemini': 'Gemini 2.0 Flash: Faster response, good for simple schedules.',
+        'model.tooltip.gemini': 'Gemini 3 Flash Preview: Best for text analysis.',
         'language.en': 'English',
         'language.id': 'Bahasa Indonesia',
+        'input.mode.image': 'Upload Image',
+        'input.mode.text': 'Paste Text',
+        'input.text.placeholder': "Paste your schedule here...\n\nExample:\n\"Let's meet next Friday at 2pm for the project review.\"",
+        'input.text.analyze_btn': 'Analyze Text',
+        'input.text.clear_btn': 'Clear',
+        'input.text.error_empty': 'Please paste some text to analyze.',
     },
     id: {
         'app.title': 'CalSnap',
@@ -108,9 +114,15 @@ export const translations = {
         'model.title': 'Model AI',
         'model.tooltip.title': 'Pilih model yang mana?',
         'model.tooltip.qwen': 'Qwen 2.5 VL: Lebih akurat untuk tata letak yang kompleks.',
-        'model.tooltip.gemini': 'Gemini 2.0 Flash: Respon lebih cepat, bagus untuk jadwal sederhana.',
+        'model.tooltip.gemini': 'Gemini 3 Flash Preview: Best for text analysis.',
         'language.en': 'English',
         'language.id': 'Indonesia',
+        'input.mode.image': 'Upload Gambar',
+        'input.mode.text': 'Tempel Teks',
+        'input.text.placeholder': "Tempel jadwal Anda di sini...\n\nContoh:\n\"Ayo ketemu Jumat depan jam 2 siang untuk review proyek.\"",
+        'input.text.analyze_btn': 'Analisis Teks',
+        'input.text.clear_btn': 'Hapus',
+        'input.text.error_empty': 'Mohon tempel teks untuk dianalisis.',
     }
 };
 
