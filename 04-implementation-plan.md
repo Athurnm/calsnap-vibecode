@@ -3,33 +3,44 @@
 ## Technology Stack
 
 ### Frontend Framework
+
 **Vite + Vanilla JavaScript** (or React if preferred)
+
 - Reason: Lightweight, fast, no framework overhead for simple SPA
 - Alternative: Next.js if SSR/SEO needed (likely not for tool-first app)
 
 ### Styling
+
 **Tailwind CSS**
+
 - Utility-first for rapid development
 - Built-in responsive utilities
 - Easy dark mode support (future)
 
 ### LLM Vision API
-**OpenAI GPT-4 Vision** or **Google Gemini Vision**
+
+**qwen/qwen3-vl-235b-a22b-instruct**
+
 - OCR + table structure understanding
 - JSON output capability
 - Reliable date/time extraction
+- Use open router to run the model
 
 ### Storage
+
 **SessionStorage** (client-side only)
+
 - No backend database
 - Cleared on browser close
 - 5-10MB limit (sufficient for images)
 
 ### Calendar Export
+
 - **Google Calendar:** URL scheme (`calendar.google.com/render`)
 - **Apple Calendar:** `.ics` file generation (RFC 5545)
 
 ### Deployment
+
 - **Vercel** or **Netlify** (static hosting)
 - **Cloudflare Pages** (if need edge functions)
 - Environment variable for LLM API key
@@ -39,6 +50,7 @@
 ## Phase 1: Core Upload & Processing (Week 1)
 
 ### 1.1 Project Setup
+
 ```bash
 npm create vite@latest calsnap -- --template vanilla
 cd calsnap
@@ -48,6 +60,7 @@ npx tailwindcss init -p
 ```
 
 **Install Dependencies:**
+
 ```bash
 npm install lucide  # Icons
 npm install date-fns # Date formatting
@@ -55,6 +68,7 @@ npm install ical-generator # iCal file generation
 ```
 
 **Project Structure:**
+
 ```
 calsnap/
 ├── index.html
@@ -88,6 +102,7 @@ calsnap/
 **File:** `src/components/UploadZone.js`
 
 **Features:**
+
 - Drag & drop zone
 - Click to browse
 - File validation (type, size)
@@ -95,6 +110,7 @@ calsnap/
 - Loading state
 
 **Implementation:**
+
 ```javascript
 export class UploadZone {
   constructor(onUpload) {
@@ -170,6 +186,7 @@ export class UploadZone {
 **File:** `src/lib/llm.js`
 
 **Function:**
+
 ```javascript
 export async function analyzeScheduleImage(base64Image) {
   const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
@@ -278,11 +295,13 @@ window.addEventListener('beforeunload', () => {
 **File:** `src/components/ResultsTable.js`
 
 **Features:**
+
 - Render events as table (desktop) or cards (mobile)
 - Inline editing (activity, date, time)
 - Action buttons (recurring, delete, export)
 
 **Structure:**
+
 ```javascript
 export class ResultsTable {
   constructor(events, onUpdate) {
@@ -551,6 +570,7 @@ export const logger = new ActivityLog();
 ### 4.1 Testing Checklist
 
 **Manual Testing:**
+
 - [ ] Upload PNG/JPG/JPEG
 - [ ] Reject unsupported formats
 - [ ] Reject files > 10MB
@@ -577,6 +597,7 @@ export const logger = new ActivityLog();
 - [ ] Screen reader announces changes
 
 **Accessibility Audit:**
+
 - [ ] Run Lighthouse accessibility scan (score ≥ 90)
 - [ ] Test with NVDA/VoiceOver
 - [ ] Check color contrast (use WebAIM checker)
@@ -588,6 +609,7 @@ export const logger = new ActivityLog();
 ### 4.2 Environment Setup
 
 **`.env` file:**
+
 ```
 VITE_OPENAI_API_KEY=sk-...
 VITE_APP_NAME=CalSnap
@@ -595,6 +617,7 @@ VITE_MAX_FILE_SIZE=10485760
 ```
 
 **`.gitignore`:**
+
 ```
 node_modules/
 dist/
@@ -607,19 +630,23 @@ dist/
 ### 4.3 Deployment (Vercel)
 
 **Install Vercel CLI:**
+
 ```bash
 npm install -g vercel
 ```
 
 **Deploy:**
+
 ```bash
 vercel --prod
 ```
 
 **Environment Variables (Vercel Dashboard):**
+
 - `VITE_OPENAI_API_KEY`
 
 **Domain:**
+
 - Custom domain or `calsnap.vercel.app`
 
 ---
@@ -640,11 +667,13 @@ vercel --prod
 ## Cost Estimate
 
 ### LLM API (OpenAI GPT-4 Vision)
+
 - **Cost per image:** ~$0.01 - $0.05 (depending on size)
 - **Expected usage:** 100 images/day = $1-5/day = $30-150/month
 - **Mitigation:** Rate limiting, caching common schedules
 
 ### Hosting (Vercel Free Tier)
+
 - **Cost:** $0/month (adequate for MVP)
 - **Upgrade:** $20/month if traffic > 100GB bandwidth
 
