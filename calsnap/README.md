@@ -1,25 +1,29 @@
 # CalSnap 📸📅
 
-Turn your schedule screenshots into a digital calendar instantly using AI.
+Turn your schedule screenshots into a digital calendar instantly using AI. Processed securely via OpenRouter with no personal data stored on our servers.
 
 ## Features
 
 - **AI-Powered Extraction** - Upload a screenshot of your schedule and let AI extract all events
-- **Multiple AI Models** - Choose between Google Gemini 2.0 Flash or Qwen 3 VL for analysis
-- **Inline Editing** - Edit all event details directly in the results table
-- **All-Day Events** - Support for both timed and all-day events
+- **Smart Date Parsing** - Detects date ranges (e.g., "Dec 1-3") automatically
+- **Recurring Events** - Set events to repeat Daily, Weekly, or Monthly
+- **Multiple AI Models** - Choose between **Qwen 2.5 VL** (High Accuracy) or **Gemini 2.0 Flash** (Fast Speed)
+- **Inline Editing** - Edit dates, times, activity names, and recurrence rules directly in the browser
 - **Export Options**
-  - Direct Google Calendar links for each event
-  - Download .ics file for Outlook, Apple Calendar, or Google Calendar
-- **Responsive Design** - Works seamlessly on desktop and mobile
-- **Session Persistence** - Your events are saved in the browser session
+  - Direct Google Calendar links with pre-filled details (including recurrence)
+  - Download .ics file compatible with Outlook, Apple Calendar, and Google Calendar
+- **User-Friendly Interface**
+  - Toast notifications for actions
+  - Auto-scroll to newly added events
+  - Helpful tooltips and import guides for Android/iOS
+- **Privacy Focused** - No backend database; your schedule data lives only in your browser session
 
 ## Tech Stack
 
 - **Frontend**: React + TypeScript + Vite
 - **Styling**: Tailwind CSS
-- **Icons**: Lucide React
-- **AI**: OpenRouter API (Google Gemini / Qwen models)
+- **UI Components**: Lucide React, Sonner (Toasts)
+- **AI**: OpenRouter API (Access to top-tier Vision Models)
 - **Calendar**: ical-generator for .ics file creation
 
 ## Getting Started
@@ -64,51 +68,43 @@ npm run build
 
 ## Usage
 
-1. **Select AI Model** - Choose between Google or Qwen on the landing page
-2. **Upload Image** - Drag and drop or click to upload a schedule screenshot
-3. **Review & Edit** - The AI extracts events which you can edit inline
-4. **Export** - Use Google Calendar links or download .ics file
+1. **Select AI Model** - Use the tooltip to guide your choice (Qwen for complex layouts, Gemini for speed).
+2. **Upload Image** - Drag and drop or click to upload a schedule screenshot.
+3. **Review & Edit** - The AI extracts events. You can:
+    - Click dates to set **Date Ranges** or **Recurrence** (Daily/Weekly/Monthly).
+    - Edit activity names and times inline.
+    - Duplicate or delete events.
+4. **Export** -
+    - Click the Google Calendar icon for individual events.
+    - Click **Download Calendar (.ics)** for the full schedule.
+    - Use the "How do I use this file?" guide for iPhone/Android specific instructions.
 
 ## Project Structure
 
-```
+```text
 calsnap/
 ├── src/
 │   ├── components/
 │   │   ├── UploadZone.tsx      # File upload interface
-│   │   ├── ProcessingState.tsx # Loading states
-│   │   └── ResultsTable.tsx    # Event table with editing
+│   │   ├── ProcessingState.tsx # Loading states with tips
+│   │   └── ResultsTable.tsx    # Event table with inline editing & recurrence
 │   ├── lib/
 │   │   ├── llm.ts              # AI integration with retry logic
-│   │   ├── export.ts           # Calendar export utilities
+│   │   ├── export.ts           # Calendar export utilities (GCal/ICS)
 │   │   └── storage.ts          # Session storage management
 │   ├── types/
 │   │   └── index.ts            # TypeScript interfaces
-│   ├── App.tsx                 # Main application
+│   ├── App.tsx                 # Main application logic
 │   └── main.tsx                # Entry point
 ├── .env                        # Environment variables (not in git)
 └── package.json
 ```
 
-## Features in Detail
+## Privacy & Security
 
-### AI Model Selection
-
-- **Google Gemini 2.0 Flash**: Fast and accurate for most schedules
-- **Qwen 3 VL**: Alternative model with different strengths
-
-### Event Editing
-
-- Click on date/time to open popover editor
-- Toggle between timed and all-day events
-- Edit activity names, notes, and times inline
-- Duplicate or delete events with one click
-
-### Export Options
-
-- **Google Calendar**: Direct link opens GCal with pre-filled event
-- **ICS Download**: Universal format for all calendar apps
-- Supports both timed and all-day events
+- **Data Handling**: Images are processed via OpenRouter's API for extraction only.
+- **No Storage**: We do not store your images or schedule data on any backend server.
+- **Local Session**: Your extracted events persist in your browser's local storage for convenience until you close the tab or click "Start Over".
 
 ## License
 

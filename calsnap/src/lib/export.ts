@@ -1,4 +1,6 @@
 import type { CalendarEvent } from '../types';
+import { ICalEventRepeatingFreq } from 'ical-generator';
+import type { ICalEventData } from 'ical-generator';
 
 export const generateGoogleCalendarUrl = (event: CalendarEvent): string => {
     if (!event || !event.date) {
@@ -77,7 +79,8 @@ export const generateIcsFile = async (events: CalendarEvent[]): Promise<void> =>
         // Check if it's an all-day event
         if (!event.startTime) {
             // All-day event
-            const eventConfig: any = {
+
+            const eventConfig: ICalEventData = {
                 start: new Date(event.date),
                 allDay: true,
                 summary: event.activity || 'Untitled Event',
@@ -94,10 +97,10 @@ export const generateIcsFile = async (events: CalendarEvent[]): Promise<void> =>
 
             // Add recurrence rule if specified
             if (event.recurrence && event.recurrence !== 'none') {
-                const freqMap: Record<string, string> = {
-                    daily: 'DAILY',
-                    weekly: 'WEEKLY',
-                    monthly: 'MONTHLY'
+                const freqMap: Record<string, ICalEventRepeatingFreq> = {
+                    daily: ICalEventRepeatingFreq.DAILY,
+                    weekly: ICalEventRepeatingFreq.WEEKLY,
+                    monthly: ICalEventRepeatingFreq.MONTHLY
                 };
                 if (freqMap[event.recurrence]) {
                     eventConfig.repeating = { freq: freqMap[event.recurrence] };
@@ -124,7 +127,7 @@ export const generateIcsFile = async (events: CalendarEvent[]): Promise<void> =>
                 end.setHours(end.getHours() + 1);
             }
 
-            const eventConfig: any = {
+            const eventConfig: ICalEventData = {
                 start,
                 end,
                 summary: event.activity || 'Untitled Event',
@@ -134,10 +137,10 @@ export const generateIcsFile = async (events: CalendarEvent[]): Promise<void> =>
 
             // Add recurrence rule if specified
             if (event.recurrence && event.recurrence !== 'none') {
-                const freqMap: Record<string, string> = {
-                    daily: 'DAILY',
-                    weekly: 'WEEKLY',
-                    monthly: 'MONTHLY'
+                const freqMap: Record<string, ICalEventRepeatingFreq> = {
+                    daily: ICalEventRepeatingFreq.DAILY,
+                    weekly: ICalEventRepeatingFreq.WEEKLY,
+                    monthly: ICalEventRepeatingFreq.MONTHLY
                 };
                 if (freqMap[event.recurrence]) {
                     eventConfig.repeating = { freq: freqMap[event.recurrence] };

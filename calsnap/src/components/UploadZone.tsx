@@ -1,18 +1,23 @@
 import React, { useCallback, useState } from 'react';
 import { Upload, X, FileImage, AlertCircle } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContextCore';
 
 interface UploadZoneProps {
     onFileSelect: (file: File) => void;
     isProcessing?: boolean;
+    error?: string;
 }
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'];
 
-export const UploadZone: React.FC<UploadZoneProps> = ({ onFileSelect, isProcessing }) => {
+export const UploadZone: React.FC<UploadZoneProps> = ({ onFileSelect, isProcessing, error: externalError }) => {
+    const { t } = useLanguage();
     const [isDragging, setIsDragging] = useState(false);
-    const [error, setError] = useState<string | null>(null);
+    const [localError, setLocalError] = useState<string | null>(null);
     const [preview, setPreview] = useState<string | null>(null);
+
+    const displayError = externalError || localError;
 
     const handleDragOver = useCallback((e: React.DragEvent) => {
         e.preventDefault();
@@ -25,15 +30,15 @@ export const UploadZone: React.FC<UploadZoneProps> = ({ onFileSelect, isProcessi
     }, []);
 
     const validateAndProcessFile = useCallback((file: File) => {
-        setError(null);
+        setLocalError(null);
 
         if (!ALLOWED_TYPES.includes(file.type)) {
-            setError('Invalid file type. Please upload a PNG, JPG, or WebP image.');
+            setLocalError(t('error.fileType'));
             return;
         }
 
         if (file.size > MAX_FILE_SIZE) {
-            setError('File is too large. Maximum size is 10MB.');
+            setLocalError(t('error.fileSize'));
             return;
         }
 
@@ -44,7 +49,7 @@ export const UploadZone: React.FC<UploadZoneProps> = ({ onFileSelect, isProcessi
         reader.readAsDataURL(file);
 
         onFileSelect(file);
-    }, [onFileSelect]);
+    }, [onFileSelect, t]);
 
     const handleDrop = useCallback((e: React.DragEvent) => {
         e.preventDefault();
@@ -67,7 +72,7 @@ export const UploadZone: React.FC<UploadZoneProps> = ({ onFileSelect, isProcessi
 
     const clearFile = useCallback(() => {
         setPreview(null);
-        setError(null);
+        setLocalError(null);
         // Note: We might want to notify parent to clear selection
     }, []);
 
@@ -99,55 +104,50 @@ export const UploadZone: React.FC<UploadZoneProps> = ({ onFileSelect, isProcessi
                 </div>
             ) : (
                 <div
+                    className={`
+                    relative w-full aspect-[2/1] min-h-[300px] rounded-xl border-2 border-dashed transition-all duration-200 ease-in-out flex flex-col items-center justify-center p-8
+                    ${isDragging
+                            ? 'border-blue-500 bg-blue-50/50 scale-[1.02]'
+                            : displayError
+                                ? 'border-red-300 bg-red-50/10 hover:border-red-400 hover:bg-red-50/20'
+                                : 'border-gray-200 bg-white hover:border-blue-400 hover:bg-blue-50/30'
+                        }
+                `}
                     onDragOver={handleDragOver}
                     onDragLeave={handleDragLeave}
                     onDrop={handleDrop}
-                    onClick={() => !isProcessing && document.getElementById('file-upload')?.click()}
-                    className={`
-            relative group cursor-pointer
-            flex flex-col items-center justify-center
-            p-10 rounded-2xl border-2 border-dashed
-            transition-all duration-200 ease-in-out
-            ${isDragging
-                            ? 'border-blue-500 bg-blue-50/50 scale-[1.02]'
-                            : 'border-gray-300 hover:border-blue-400 hover:bg-gray-50'
-                        }
-            ${error ? 'border-red-300 bg-red-50/30' : ''}
-            ${isProcessing ? 'opacity-50 cursor-not-allowed' : ''}
-          `}
                 >
                     <input
-                        id="file-upload"
                         type="file"
-                        className="hidden"
-                        accept={ALLOWED_TYPES.join(',')}
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                         onChange={handleFileInput}
+                        accept={ALLOWED_TYPES.join(',')}
                         disabled={isProcessing}
-                        aria-label="Upload schedule image"
+                        aria-label={t('upload.title')}
                     />
 
-                    <div className={`
-            p-4 rounded-full bg-blue-50 text-blue-600 mb-4
-            group-hover:scale-110 group-hover:bg-blue-100 transition-transform duration-200
-            ${error ? 'bg-red-50 text-red-500' : ''}
-          `}>
-                        {error ? <AlertCircle size={32} /> : <Upload size={32} />}
+                    <div className={`p-4 rounded-full mb-4 transition-colors ${isDragging ? 'bg-blue-100 text-blue-600' :
+                        displayError ? 'bg-red-100 text-red-600' : 'bg-gray-100 text-gray-400 group-hover:bg-blue-100 group-hover:text-blue-600'
+                        }`}>
+                        {displayError ? <AlertCircle size={32} /> : <Upload size={32} />}
                     </div>
 
-                    <h3 className="text-lg font-semibold text-gray-900 mb-1">
-                        {error ? 'Upload failed' : 'Upload your schedule'}
-                    </h3>
+                    <div className="teerxt-center space-y-2">
+                        <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                            {displayError ? t('upload.failed') : t('upload.title')}
+                        </h3>
 
-                    <p className="text-sm text-gray-500 text-center max-w-xs">
-                        {error || 'Drag and drop your schedule image here, or click to browse'}
-                    </p>
+                        <p className="text-sm text-gray-500 text-center max-w-xs">
+                            {displayError || (isDragging ? t('upload.dragActive') : t('upload.subtitle'))}
+                        </p>
 
-                    {!error && (
-                        <div className="mt-4 flex items-center gap-2 text-xs text-gray-400">
-                            <FileImage size={14} />
-                            <span>PNG, JPG, WebP up to 10MB</span>
-                        </div>
-                    )}
+                        {!displayError && (
+                            <div className="mt-4 flex items-center gap-2 text-xs text-gray-400">
+                                <FileImage size={14} />
+                                <span>{t('upload.formats')}</span>
+                            </div>
+                        )}
+                    </div>
                 </div>
             )}
         </div>

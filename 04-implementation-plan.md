@@ -11,7 +11,7 @@
 
 ### Styling
 
-**Tailwind CSS**
+### Tailwind CSS
 
 - Utility-first for rapid development
 - Built-in responsive utilities
@@ -19,7 +19,7 @@
 
 ### LLM Vision API
 
-**qwen/qwen3-vl-235b-a22b-instruct**
+### qwen/qwen3-vl-235b-a22b-instruct
 
 - OCR + table structure understanding
 - JSON output capability
@@ -69,7 +69,7 @@ npm install ical-generator # iCal file generation
 
 **Project Structure:**
 
-```
+```text
 calsnap/
 ├── index.html
 ├── src/
@@ -610,7 +610,7 @@ export const logger = new ActivityLog();
 
 **`.env` file:**
 
-```
+```env
 VITE_OPENAI_API_KEY=sk-...
 VITE_APP_NAME=CalSnap
 VITE_MAX_FILE_SIZE=10485760
@@ -618,7 +618,7 @@ VITE_MAX_FILE_SIZE=10485760
 
 **`.gitignore`:**
 
-```
+```text
 node_modules/
 dist/
 .env
@@ -654,7 +654,7 @@ vercel --prod
 ## Estimated Timeline
 
 | Phase | Duration | Deliverable |
-|-------|----------|-------------|
+| ----- | -------- | ----------- |
 | **Phase 1** | 1 week | Upload + LLM processing working |
 | **Phase 2** | 1 week | Table editing + export working |
 | **Phase 3** | 1 week | Localization + activity log done |
@@ -681,4 +681,4 @@ vercel --prod
 
 ---
 
-*Implementation Plan v1.0 — CalSnap*
+### Implementation Plan v1.0 — CalSnap

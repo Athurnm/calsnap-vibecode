@@ -1,25 +1,27 @@
 import React from 'react';
 import { Loader2 } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContextCore';
 
 interface ProcessingStateProps {
     status: 'uploading' | 'analyzing' | 'extracting';
 }
 
-const tips = [
-    "Did you know? You can set recurring events after processing.",
-    "Pro Tip: Check the 'End Date' for multi-day events.",
-    "Your schedule is securely analyzed via OpenRouter AI.",
-    "You can edit details before downloading your calendar.",
-    "Reviewing now ensures your schedule is 100% accurate."
-];
-
 export const ProcessingState: React.FC<ProcessingStateProps> = ({ status }) => {
+    const { t } = useLanguage();
     const [tipIndex, setTipIndex] = React.useState(0);
 
+    const tips = [
+        t('tip.1'),
+        t('tip.2'),
+        t('tip.3'),
+        t('tip.4'),
+        t('tip.5')
+    ];
+
     const messages = {
-        uploading: 'Uploading your schedule...',
-        analyzing: 'Analyzing image structure...',
-        extracting: 'Extracting events and details...',
+        uploading: 'Uploading your schedule...', // TODO: Add to translations if needed, or keep dynamic status messages separate
+        analyzing: t('processing.analyzing'),
+        extracting: t('processing.extracting'),
     };
 
     React.useEffect(() => {
@@ -27,7 +29,7 @@ export const ProcessingState: React.FC<ProcessingStateProps> = ({ status }) => {
             setTipIndex((prev) => (prev + 1) % tips.length);
         }, 3000);
         return () => clearInterval(interval);
-    }, []);
+    }, [tips.length]);
 
     return (
         <div className="flex flex-col items-center justify-center p-12 text-center animate-in fade-in zoom-in duration-300">

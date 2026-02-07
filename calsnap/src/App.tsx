@@ -1,7 +1,11 @@
 import { useState, useEffect } from 'react';
+import { useLanguage } from './context/LanguageContextCore';
+import { LanguageToggle } from './components/LanguageToggle';
 import { UploadZone } from './components/UploadZone';
 import { ProcessingState } from './components/ProcessingState';
 import { ResultsTable } from './components/ResultsTable';
+import { ActivityLog } from './components/ActivityLog';
+import { logger } from './lib/logger';
 import { analyzeScheduleImage, MODEL_OPTIONS } from './lib/llm';
 import type { ModelOption } from './lib/llm';
 import { storage } from './lib/storage';
@@ -11,6 +15,7 @@ import { Toaster, toast } from 'sonner';
 import { Info, HelpCircle, ChevronDown, ChevronUp, Download } from 'lucide-react';
 
 function App() {
+  const { t } = useLanguage();
   const [appState, setAppState] = useState<'upload' | 'processing' | 'results'>('upload');
   const [processingStatus, setProcessingStatus] = useState<'uploading' | 'analyzing' | 'extracting'>('analyzing');
   const [events, setEvents] = useState<CalendarEvent[]>([]);
@@ -61,7 +66,9 @@ function App() {
       setAppState('results');
     } catch (err) {
       console.error(err);
-      setError(err instanceof Error ? err.message : 'Failed to process image');
+      const errorMessage = err instanceof Error ? err.message : 'Failed to process image';
+      setError(errorMessage);
+      logger.error(errorMessage);
       setAppState('upload');
     }
   };
@@ -135,13 +142,17 @@ function App() {
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 font-sans text-gray-900">
       <Toaster position="top-right" richColors />
+      <ActivityLog />
       <div className="max-w-6xl mx-auto">
-        <header className="mb-12 text-center">
+        <header className="mb-12 text-center relative">
+          <div className="absolute top-0 right-0">
+            <LanguageToggle />
+          </div>
           <h1 className="text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl mb-4">
-            Cal<span className="text-blue-600">Snap</span>
+            {t('app.title').replace('Snap', '')}<span className="text-blue-600">Snap</span>
           </h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Turn your schedule screenshots into a digital calendar instantly.
+            {t('app.subtitle')}
           </p>
         </header>
 
@@ -153,20 +164,20 @@ function App() {
           )}
 
           {appState === 'upload' && (
-            <div className="w-full max-w-md mx-auto">
+            <div className="w-full max-w-md mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
               {/* Model Selector */}
               <div className="mb-6">
                 <div className="flex items-center justify-center gap-2 mb-2">
                   <label className="text-sm font-medium text-gray-700">
-                    AI Model
+                    {t('model.title')}
                   </label>
                   <div className="group relative">
                     <Info size={16} className="text-gray-400 hover:text-blue-500 cursor-help" />
                     <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 bg-gray-900 text-white text-xs rounded-lg p-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10 shadow-lg cursor-help">
-                      <p className="font-semibold mb-1">Which model to choose?</p>
+                      <p className="font-semibold mb-1">{t('model.tooltip.title')}</p>
                       <ul className="list-disc pl-4 space-y-1">
-                        <li><strong>Qwen 2.5 VL</strong>: More accurate for complex layouts.</li>
-                        <li><strong>Gemini 2.0 Flash</strong>: Faster response, good for simple schedules.</li>
+                        <li><strong>Qwen 2.5 VL</strong>: {t('model.tooltip.qwen').replace('Qwen 2.5 VL: ', '')}</li>
+                        <li><strong>Gemini 2.0 Flash</strong>: {t('model.tooltip.gemini').replace('Gemini 2.0 Flash: ', '')}</li>
                       </ul>
                       <div className="absolute bottom-[-4px] left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-900 rotate-45"></div>
                     </div>
@@ -189,7 +200,11 @@ function App() {
                 </div>
               </div>
 
-              <UploadZone onFileSelect={handleFileSelect} />
+              <UploadZone
+                onFileSelect={handleFileSelect}
+                isProcessing={false}
+                error={error || undefined}
+              />
             </div>
           )}
 
@@ -200,20 +215,20 @@ function App() {
           {appState === 'results' && (
             <div className="w-full">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-                <div className="flex items-center gap-3">
-                  <div className="p-3 bg-green-50 text-green-700 rounded-lg inline-flex items-center gap-2 text-sm font-medium">
-                    <span>✨ Found {events.length} events</span>
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full sm:w-auto">
+                  <div className="p-3 bg-green-50 text-green-700 rounded-lg inline-flex items-center gap-2 text-sm font-medium w-full sm:w-auto justify-center sm:justify-start">
+                    <span>{t('results.foundEvents').replace('{count}', events.length.toString())}</span>
                   </div>
-                  <div className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg text-xs font-medium animate-pulse">
-                    <HelpCircle size={14} />
-                    <span>Review & edit below before downloading</span>
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg text-xs font-medium animate-pulse w-full sm:w-auto justify-center sm:justify-start">
+                    <HelpCircle size={14} className="flex-shrink-0" />
+                    <span>{t('results.reviewHint')}</span>
                   </div>
                 </div>
                 <button
                   onClick={handleStartOver}
-                  className="text-sm text-gray-500 hover:text-gray-700 underline"
+                  className="text-sm text-gray-500 hover:text-gray-700 underline self-end sm:self-auto"
                 >
-                  Start Over
+                  {t('action.startOver')}
                 </button>
               </div>
 
@@ -227,24 +242,24 @@ function App() {
 
               <div className="mt-8 pt-8 border-t border-gray-100">
                 <div className="flex flex-col items-center text-center max-w-2xl mx-auto">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Ready to add to your calendar?</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">{t('results.ready')}</h3>
                   <p className="text-gray-500 mb-6 text-sm">
-                    Download the .ics file below. You can import it into Google Calendar, Outlook, Apple Calendar, and more.
+                    {t('results.download_metrics')}
                   </p>
 
                   <button
                     onClick={handleDownloadIcs}
-                    className="group relative inline-flex items-center gap-2 px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5"
+                    className="group relative w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 sm:px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5"
                   >
-                    <Download size={20} />
-                    Download Calendar File (.ics)
+                    <Download size={20} className="flex-shrink-0" />
+                    <span className="truncate">{t('results.download_btn')}</span>
                   </button>
 
                   <button
                     onClick={() => setShowImportHelp(!showImportHelp)}
                     className="mt-6 flex items-center gap-1 text-sm text-gray-500 hover:text-blue-600 transition-colors"
                   >
-                    {showImportHelp ? 'Hide import instructions' : 'How do I use this file?'}
+                    {showImportHelp ? t('results.hide_help') : t('results.import_help')}
                     {showImportHelp ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
                   </button>
 
@@ -281,7 +296,11 @@ function App() {
         </main>
 
         <footer className="mt-12 text-center text-sm text-gray-400 pb-8">
-          <p className="mb-2">&copy; {new Date().getFullYear()} CalSnap. Processed using OpenRouter.</p>
+          <p className="mb-2">
+            {t('footer.copyright')}
+            <span className="mx-2 opacity-50">|</span>
+            Built with ❤️ by <a href="https://github.com/Athurnm" target="_blank" rel="noopener noreferrer" className="hover:text-blue-500 transition-colors">Athurnm</a>
+          </p>
           <p className="text-xs text-gray-300">No personal data is stored on our servers.</p>
         </footer>
       </div>
