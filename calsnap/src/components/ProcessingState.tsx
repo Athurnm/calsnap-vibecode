@@ -8,7 +8,7 @@ interface ProcessingStateProps {
 const tips = [
     "Did you know? You can set recurring events after processing.",
     "Pro Tip: Check the 'End Date' for multi-day events.",
-    "CalSnap runs entirely in your browser for privacy.",
+    "Your schedule is securely analyzed via OpenRouter AI.",
     "You can edit details before downloading your calendar.",
     "Reviewing now ensures your schedule is 100% accurate."
 ];

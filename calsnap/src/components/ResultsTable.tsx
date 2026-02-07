@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Trash2, Copy, Plus, Calendar, ExternalLink, Pencil, X, Check } from 'lucide-react';
+import { Trash2, Copy, Plus, Calendar, ExternalLink, Pencil, X, Check, RefreshCcw } from 'lucide-react';
 import type { CalendarEvent } from '../types';
 import { generateGoogleCalendarUrl } from '../lib/export';
 import { formatDateTime } from '../lib/utils';
@@ -254,7 +254,15 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({
                                             <Calendar size={14} className="text-gray-400 mt-0.5 group-hover/dt:text-blue-500" />
                                             <div className="flex flex-col">
                                                 <span className="text-sm font-medium text-gray-900">{dateStr}</span>
-                                                <span className="text-xs text-gray-500">{timeStr}</span>
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-xs text-gray-500">{timeStr}</span>
+                                                    {safeEvent.recurrence && safeEvent.recurrence !== 'none' && (
+                                                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-purple-100 text-purple-700 uppercase tracking-wide">
+                                                            <RefreshCcw size={10} />
+                                                            {safeEvent.recurrence}
+                                                        </span>
+                                                    )}
+                                                </div>
                                             </div>
                                             <Pencil size={10} className="text-gray-300 opacity-0 group-hover/dt:opacity-100 transition-opacity ml-1 mt-0.5" />
                                         </button>
@@ -384,7 +392,15 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({
                                     <Calendar size={14} className="text-gray-400" />
                                     <div className="flex flex-col text-left">
                                         <span className="text-sm font-medium text-gray-900">{dateStr}</span>
-                                        <span className="text-xs text-gray-500">{timeStr}</span>
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-xs text-gray-500">{timeStr}</span>
+                                            {safeEvent.recurrence && safeEvent.recurrence !== 'none' && (
+                                                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-purple-100 text-purple-700 uppercase tracking-wide">
+                                                    <RefreshCcw size={10} />
+                                                    {safeEvent.recurrence}
+                                                </span>
+                                            )}
+                                        </div>
                                     </div>
                                     <Pencil size={12} className="text-gray-300 ml-auto" />
                                 </button>

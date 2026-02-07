@@ -280,8 +280,9 @@ function App() {
           )}
         </main>
 
-        <footer className="mt-12 text-center text-sm text-gray-400">
-          <p>&copy; {new Date().getFullYear()} CalSnap. All processing happens locally.</p>
+        <footer className="mt-12 text-center text-sm text-gray-400 pb-8">
+          <p className="mb-2">&copy; {new Date().getFullYear()} CalSnap. Processed using OpenRouter.</p>
+          <p className="text-xs text-gray-300">No personal data is stored on our servers.</p>
         </footer>
       </div>
     </div>
