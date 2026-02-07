@@ -4,19 +4,21 @@ Turn your schedule screenshots into a digital calendar instantly using AI. Proce
 
 ## Features
 
-- **AI-Powered Extraction** - Upload a screenshot of your schedule and let AI extract all events
-- **Smart Date Parsing** - Detects date ranges (e.g., "Dec 1-3") automatically
-- **Recurring Events** - Set events to repeat Daily, Weekly, or Monthly
-- **Multiple AI Models** - Choose between **Qwen 2.5 VL** (High Accuracy) or **Gemini 2.0 Flash** (Fast Speed)
-- **Inline Editing** - Edit dates, times, activity names, and recurrence rules directly in the browser
+- **AI-Powered Extraction** - Upload a screenshot of your schedule and let AI extract all events.
+- **Multiple AI Models** - Choose between **Qwen 2.5 VL** (Default, High Accuracy) or **Gemini 2.0 Flash** (Fast Speed).
+- **Smart Date Parsing** - Detects date ranges and automatically formats dates (e.g., "Mon, Dec 1").
+- **Smart Event Normalization** - Automatically ensures all non-all-day events have a minimum duration of 15 minutes.
+- **Recurring Events** - Set events to repeat Daily, Weekly, or Monthly.
+- **Inline Editing** - Edit dates, times, activity names, and recurrence rules directly in the browser.
 - **Export Options**
-  - Direct Google Calendar links with pre-filled details (including recurrence)
-  - Download .ics file compatible with Outlook, Apple Calendar, and Google Calendar
+  - **Direct Google Calendar**: One-click export with pre-filled details. Visual feedback (green highlight) indicates exported events.
+  - **Download .ics**: Compatible with Outlook, Apple Calendar, and Google Calendar.
 - **User-Friendly Interface**
-  - Toast notifications for actions
-  - Auto-scroll to newly added events
-  - Helpful tooltips and import guides for Android/iOS
-- **Privacy Focused** - No backend database; your schedule data lives only in your browser session
+  - Toast notifications for actions.
+  - Auto-scroll to newly added events.
+  - Helpful tooltips and import guides.
+- **SEO Optimized** - Includes Open Graph and Twitter Card tags for better sharing.
+- **Privacy Focused** - No backend database; your schedule data lives only in your browser session.
 
 ## Tech Stack
 
@@ -24,7 +26,7 @@ Turn your schedule screenshots into a digital calendar instantly using AI. Proce
 - **Styling**: Tailwind CSS
 - **UI Components**: Lucide React, Sonner (Toasts)
 - **AI**: OpenRouter API (Access to top-tier Vision Models)
-- **Calendar**: ical-generator for .ics file creation
+- **Calendar**: ical-generator for .ics file creation, date-fns for manipulation
 
 ## Getting Started
 
@@ -66,18 +68,16 @@ npm run dev
 npm run build
 ```
 
-## Usage
+## Deployment
 
-1. **Select AI Model** - Use the tooltip to guide your choice (Qwen for complex layouts, Gemini for speed).
-2. **Upload Image** - Drag and drop or click to upload a schedule screenshot.
-3. **Review & Edit** - The AI extracts events. You can:
-    - Click dates to set **Date Ranges** or **Recurrence** (Daily/Weekly/Monthly).
-    - Edit activity names and times inline.
-    - Duplicate or delete events.
-4. **Export** -
-    - Click the Google Calendar icon for individual events.
-    - Click **Download Calendar (.ics)** for the full schedule.
-    - Use the "How do I use this file?" guide for iPhone/Android specific instructions.
+### Vercel
+
+This project is optimized for deployment on Vercel.
+
+1. Push your code to a Git repository (GitHub, GitLab, Bitbucket).
+2. Import the project into Vercel.
+3. Add your `VITE_OPENROUTER_API_KEY` in the Vercel Project Settings > Environment Variables.
+4. Deploy!
 
 ## Project Structure
 
@@ -89,20 +89,21 @@ calsnap/
 │   │   ├── ProcessingState.tsx # Loading states with tips
 │   │   └── ResultsTable.tsx    # Event table with inline editing & recurrence
 │   ├── lib/
-│   │   ├── llm.ts              # AI integration with retry logic
+│   │   ├── llm.ts              # AI integration (OpenRouter/Qwen/Gemini)
 │   │   ├── export.ts           # Calendar export utilities (GCal/ICS)
 │   │   └── storage.ts          # Session storage management
 │   ├── types/
 │   │   └── index.ts            # TypeScript interfaces
 │   ├── App.tsx                 # Main application logic
 │   └── main.tsx                # Entry point
+├── public/                     # Static assets (Favicons, manifest)
 ├── .env                        # Environment variables (not in git)
 └── package.json
 ```
 
 ## Privacy & Security
 
-- **Data Handling**: Images are processed via OpenRouter's API for extraction only.
+- **Data Handling**: Images are processed via OpenRouter's API using third-party LLMs (Google Gemini or Qwen) for extraction only.
 - **No Storage**: We do not store your images or schedule data on any backend server.
 - **Local Session**: Your extracted events persist in your browser's local storage for convenience until you close the tab or click "Start Over".
 
