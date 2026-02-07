@@ -8,6 +8,7 @@ import { storage } from './lib/storage';
 import { generateIcsFile } from './lib/export';
 import type { CalendarEvent } from './types';
 import { Toaster, toast } from 'sonner';
+import { Info, HelpCircle, ChevronDown, ChevronUp, Download } from 'lucide-react';
 
 function App() {
   const [appState, setAppState] = useState<'upload' | 'processing' | 'results'>('upload');
@@ -15,6 +16,7 @@ function App() {
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [selectedModel, setSelectedModel] = useState<ModelOption>('qwen');
+  const [showImportHelp, setShowImportHelp] = useState(false);
 
   useEffect(() => {
     try {
@@ -154,9 +156,23 @@ function App() {
             <div className="w-full max-w-md mx-auto">
               {/* Model Selector */}
               <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2 text-center">
-                  AI Model
-                </label>
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <label className="text-sm font-medium text-gray-700">
+                    AI Model
+                  </label>
+                  <div className="group relative">
+                    <Info size={16} className="text-gray-400 hover:text-blue-500 cursor-help" />
+                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 bg-gray-900 text-white text-xs rounded-lg p-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10 shadow-lg cursor-help">
+                      <p className="font-semibold mb-1">Which model to choose?</p>
+                      <ul className="list-disc pl-4 space-y-1">
+                        <li><strong>Qwen 2.5 VL</strong>: More accurate for complex layouts.</li>
+                        <li><strong>Gemini 2.0 Flash</strong>: Faster response, good for simple schedules.</li>
+                      </ul>
+                      <div className="absolute bottom-[-4px] left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-900 rotate-45"></div>
+                    </div>
+                  </div>
+                </div>
+
                 <div className="flex bg-gray-100 rounded-lg p-1">
                   {(Object.keys(MODEL_OPTIONS) as ModelOption[]).map((key) => (
                     <button
@@ -183,9 +199,15 @@ function App() {
 
           {appState === 'results' && (
             <div className="w-full">
-              <div className="flex justify-between items-center mb-6">
-                <div className="p-3 bg-green-50 text-green-700 rounded-lg inline-block text-sm font-medium">
-                  ✨ Found {events.length} events
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="p-3 bg-green-50 text-green-700 rounded-lg inline-flex items-center gap-2 text-sm font-medium">
+                    <span>✨ Found {events.length} events</span>
+                  </div>
+                  <div className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg text-xs font-medium animate-pulse">
+                    <HelpCircle size={14} />
+                    <span>Review & edit below before downloading</span>
+                  </div>
                 </div>
                 <button
                   onClick={handleStartOver}
@@ -203,16 +225,56 @@ function App() {
                 onAdd={handleAddEvent}
               />
 
-              <div className="mt-8 flex flex-col items-center pt-6 border-t border-gray-100 text-center">
-                <p className="text-sm text-gray-500 mb-4">
-                  Download your schedule as an .ics file to import into Outlook, Apple Calendar, or Google Calendar.
-                </p>
-                <button
-                  onClick={handleDownloadIcs}
-                  className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors shadow-sm"
-                >
-                  Download Calendar (.ics)
-                </button>
+              <div className="mt-8 pt-8 border-t border-gray-100">
+                <div className="flex flex-col items-center text-center max-w-2xl mx-auto">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Ready to add to your calendar?</h3>
+                  <p className="text-gray-500 mb-6 text-sm">
+                    Download the .ics file below. You can import it into Google Calendar, Outlook, Apple Calendar, and more.
+                  </p>
+
+                  <button
+                    onClick={handleDownloadIcs}
+                    className="group relative inline-flex items-center gap-2 px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5"
+                  >
+                    <Download size={20} />
+                    Download Calendar File (.ics)
+                  </button>
+
+                  <button
+                    onClick={() => setShowImportHelp(!showImportHelp)}
+                    className="mt-6 flex items-center gap-1 text-sm text-gray-500 hover:text-blue-600 transition-colors"
+                  >
+                    {showImportHelp ? 'Hide import instructions' : 'How do I use this file?'}
+                    {showImportHelp ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                  </button>
+
+                  {showImportHelp && (
+                    <div className="mt-4 w-full bg-gray-50 rounded-xl p-6 text-left animate-in fade-in slide-in-from-top-2 duration-300">
+                      <div className="grid sm:grid-cols-2 gap-6">
+                        <div>
+                          <h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
+                            <span className="px-2 py-0.5 bg-green-100 text-green-700 rounded text-xs">Android</span>
+                          </h4>
+                          <ol className="list-decimal list-inside text-sm text-gray-600 space-y-2">
+                            <li>Tap <span className="font-medium">Download</span> above.</li>
+                            <li>Open the downloaded file from your notification bar or Downloads folder.</li>
+                            <li>Tap "Add all" or select specific events to add to your calendar.</li>
+                          </ol>
+                        </div>
+                        <div>
+                          <h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
+                            <span className="px-2 py-0.5 bg-gray-200 text-gray-700 rounded text-xs">iPhone / iOS</span>
+                          </h4>
+                          <ol className="list-decimal list-inside text-sm text-gray-600 space-y-2">
+                            <li>Tap <span className="font-medium">Download</span> above.</li>
+                            <li>Tap "Add All" in the standard iOS calendar dialog.</li>
+                            <li>Choose which calendar to add the events to.</li>
+                          </ol>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           )}
