@@ -13,12 +13,23 @@ export const generateGoogleCalendarUrl = (event: CalendarEvent): string => {
 
     // Check if it's an all-day event (no start time)
     if (!event.startTime) {
-        // All-day event format: YYYYMMDD/YYYYMMDD (next day for single day event)
+        // All-day event format: YYYYMMDD/YYYYMMDD
         const dateStr = event.date.replace(/-/g, '');
-        const nextDay = new Date(event.date);
-        nextDay.setDate(nextDay.getDate() + 1);
-        const nextDateStr = nextDay.toISOString().split('T')[0].replace(/-/g, '');
-        params.set('dates', `${dateStr}/${nextDateStr}`);
+
+        // Use endDate if provided, otherwise use next day for single-day event
+        let endDateStr: string;
+        if (event.endDate) {
+            // For multi-day events, Google Calendar needs the day AFTER the last day
+            const dayAfterEnd = new Date(event.endDate);
+            dayAfterEnd.setDate(dayAfterEnd.getDate() + 1);
+            endDateStr = dayAfterEnd.toISOString().split('T')[0].replace(/-/g, '');
+        } else {
+            const nextDay = new Date(event.date);
+            nextDay.setDate(nextDay.getDate() + 1);
+            endDateStr = nextDay.toISOString().split('T')[0].replace(/-/g, '');
+        }
+
+        params.set('dates', `${dateStr}/${endDateStr}`);
     } else {
         // Timed event format: YYYYMMDDTHHMMSS
         const formatDateTime = (date: string, time: string): string => {
@@ -28,15 +39,29 @@ export const generateGoogleCalendarUrl = (event: CalendarEvent): string => {
         };
 
         const startDateTime = formatDateTime(event.date, event.startTime);
-        const endDateTime = event.endTime
-            ? formatDateTime(event.date, event.endTime)
-            : formatDateTime(event.date, event.startTime);
+
+        // For timed events with endDate, use the endDate with endTime or startTime
+        const endDate = event.endDate || event.date;
+        const endTime = event.endTime || event.startTime;
+        const endDateTime = formatDateTime(endDate, endTime);
 
         params.set('dates', `${startDateTime}/${endDateTime}`);
     }
 
     if (event.notes) params.set('details', event.notes);
     if (event.location) params.set('location', event.location);
+
+    // Add recurrence rule if specified
+    if (event.recurrence && event.recurrence !== 'none') {
+        const rruleMap: Record<string, string> = {
+            daily: 'RRULE:FREQ=DAILY',
+            weekly: 'RRULE:FREQ=WEEKLY',
+            monthly: 'RRULE:FREQ=MONTHLY'
+        };
+        if (rruleMap[event.recurrence]) {
+            params.set('recur', rruleMap[event.recurrence]);
+        }
+    }
 
     return `${baseUrl}?${params.toString()}`;
 };
@@ -52,31 +77,74 @@ export const generateIcsFile = async (events: CalendarEvent[]): Promise<void> =>
         // Check if it's an all-day event
         if (!event.startTime) {
             // All-day event
-            calendar.createEvent({
+            const eventConfig: any = {
                 start: new Date(event.date),
                 allDay: true,
                 summary: event.activity || 'Untitled Event',
                 description: event.notes,
                 location: event.location
-            });
+            };
+
+            // If endDate is specified, set the end to the day AFTER endDate
+            if (event.endDate) {
+                const endDate = new Date(event.endDate);
+                endDate.setDate(endDate.getDate() + 1);
+                eventConfig.end = endDate;
+            }
+
+            // Add recurrence rule if specified
+            if (event.recurrence && event.recurrence !== 'none') {
+                const freqMap: Record<string, string> = {
+                    daily: 'DAILY',
+                    weekly: 'WEEKLY',
+                    monthly: 'MONTHLY'
+                };
+                if (freqMap[event.recurrence]) {
+                    eventConfig.repeating = { freq: freqMap[event.recurrence] };
+                }
+            }
+
+            calendar.createEvent(eventConfig);
         } else {
             // Timed event
             const start = new Date(`${event.date}T${event.startTime}`);
-            let end = new Date(`${event.date}T${event.startTime}`);
 
-            if (event.endTime) {
+            // Calculate end time considering endDate
+            let end: Date;
+            if (event.endDate && event.endTime) {
+                end = new Date(`${event.endDate}T${event.endTime}`);
+            } else if (event.endDate) {
+                // If endDate exists but no endTime, use startTime on endDate
+                end = new Date(`${event.endDate}T${event.startTime}`);
+            } else if (event.endTime) {
                 end = new Date(`${event.date}T${event.endTime}`);
             } else {
+                // Default to 1 hour later
+                end = new Date(start);
                 end.setHours(end.getHours() + 1);
             }
 
-            calendar.createEvent({
+            const eventConfig: any = {
                 start,
                 end,
                 summary: event.activity || 'Untitled Event',
                 description: event.notes,
                 location: event.location
-            });
+            };
+
+            // Add recurrence rule if specified
+            if (event.recurrence && event.recurrence !== 'none') {
+                const freqMap: Record<string, string> = {
+                    daily: 'DAILY',
+                    weekly: 'WEEKLY',
+                    monthly: 'MONTHLY'
+                };
+                if (freqMap[event.recurrence]) {
+                    eventConfig.repeating = { freq: freqMap[event.recurrence] };
+                }
+            }
+
+            calendar.createEvent(eventConfig);
         }
     });
 

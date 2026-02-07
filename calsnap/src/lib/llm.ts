@@ -14,10 +14,12 @@ Analyze this schedule image and extract calendar events.
 Instructions:
 1. Identify table structure or calendar layout.
 2. Extract each event with: activity name, date, start time (if shown), end time (if shown).
-3. Return a JSON array: [{ "activity": "string", "date": "YYYY-MM-DD", "startTime": "HH:MM" or null, "endTime": "HH:MM" or null }]
-4. If date is ambiguous, use best guess based on context (assume current year if missing).
-5. If time is not shown in the schedule, set startTime and endTime to null (for all-day events).
-6. Return ONLY valid JSON, no markdown, no explanations.
+3. **IMPORTANT**: Detect date ranges - if you see patterns like "Dec 1 - Dec 5", "Tgl 1 - 5", "2026-01-01 - 2026-01-03", or "{date} - {date}", extract BOTH the start date and end date.
+4. Return a JSON array: [{ "activity": "string", "date": "YYYY-MM-DD", "endDate": "YYYY-MM-DD" or null, "startTime": "HH:MM" or null, "endTime": "HH:MM" or null }]
+5. Set "endDate" ONLY when the event explicitly spans multiple days. For single-day events, set endDate to null or omit it.
+6. If date is ambiguous, use best guess based on context (assume current year if missing).
+7. If time is not shown in the schedule, set startTime and endTime to null (for all-day events).
+8. Return ONLY valid JSON, no markdown, no explanations.
 `;
 
 const MAX_RETRIES = 3;
@@ -99,10 +101,12 @@ export async function analyzeScheduleImage(
             const normalizedEvents = events.map(event => ({
                 activity: event.activity || 'Untitled Event',
                 date: event.date || new Date().toISOString().split('T')[0],
+                endDate: event.endDate || undefined,
                 startTime: event.startTime || null,
                 endTime: event.endTime || null,
                 location: event.location || '',
-                notes: event.notes || ''
+                notes: event.notes || '',
+                recurrence: event.recurrence || 'none'
             }));
 
             console.log(`Successfully extracted ${normalizedEvents.length} events`);

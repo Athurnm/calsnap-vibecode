@@ -7,6 +7,7 @@ import type { ModelOption } from './lib/llm';
 import { storage } from './lib/storage';
 import { generateIcsFile } from './lib/export';
 import type { CalendarEvent } from './types';
+import { Toaster, toast } from 'sonner';
 
 function App() {
   const [appState, setAppState] = useState<'upload' | 'processing' | 'results'>('upload');
@@ -81,6 +82,7 @@ function App() {
     const newEvents = events.filter((_, i) => i !== index);
     setEvents(newEvents);
     storage.saveEvents(newEvents);
+    toast.success('Event deleted successfully!');
   };
 
   const handleDuplicateEvent = (index: number) => {
@@ -89,6 +91,7 @@ function App() {
     newEvents.splice(index + 1, 0, { ...eventToCopy });
     setEvents(newEvents);
     storage.saveEvents(newEvents);
+    toast.success('Event duplicated successfully!');
   };
 
   const handleAddEvent = () => {
@@ -99,11 +102,23 @@ function App() {
       startTime: null, // All-day by default
       endTime: null,
       location: '',
-      notes: ''
+      notes: '',
+      recurrence: 'none'
     };
     const newEvents = [...events, newEvent];
     setEvents(newEvents);
     storage.saveEvents(newEvents);
+
+    // Show success toast
+    toast.success('Event added successfully!');
+
+    // Trigger scroll to new event
+    setTimeout(() => {
+      const tableContainer = document.querySelector('[data-table-container]');
+      if (tableContainer) {
+        tableContainer.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      }
+    }, 100);
   };
 
   const handleDownloadIcs = async () => {
@@ -117,6 +132,7 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 font-sans text-gray-900">
+      <Toaster position="top-right" richColors />
       <div className="max-w-6xl mx-auto">
         <header className="mb-12 text-center">
           <h1 className="text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl mb-4">
@@ -147,8 +163,8 @@ function App() {
                       key={key}
                       onClick={() => setSelectedModel(key)}
                       className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all ${selectedModel === key
-                          ? 'bg-white text-blue-600 shadow-sm'
-                          : 'text-gray-600 hover:text-gray-900'
+                        ? 'bg-white text-blue-600 shadow-sm'
+                        : 'text-gray-600 hover:text-gray-900'
                         }`}
                     >
                       {MODEL_OPTIONS[key].label}
