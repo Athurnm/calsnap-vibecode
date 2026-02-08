@@ -1,5 +1,7 @@
 // @ts-ignore
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+// @ts-ignore
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 // Utility to handle Deno global for non-Deno environments (IDE)
 declare const Deno: any;
@@ -32,22 +34,57 @@ serve(async (req: Request) => {
             throw new Error('Midtrans Server Key not configured');
         }
 
-        // Get user from auth header (optional validation)
-        // const { data: { user }, error: authError } = await supabase.auth.getUser(token) ...
+        // Get user from auth header
+        const supabaseClient = createClient(
+            Deno.env.get('SUPABASE_URL') ?? '',
+            Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+            { global: { headers: { Authorization: authHeader } } }
+        );
+
+        const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
+
+        if (userError || !user) {
+            console.error('Auth Error:', userError);
+            throw new Error('User not found or not authenticated');
+        }
+
+        const email = user.email;
+        const fullName = user.user_metadata?.full_name || email?.split('@')[0] || 'User';
+        const phone = user.user_metadata?.phone || '';
+
+        // Split name into first and last name for Midtrans (optional but good practice)
+        const nameParts = fullName.split(' ');
+        const firstName = nameParts[0];
+        const lastName = nameParts.slice(1).join(' ') || '';
 
         // Create transaction details
         const orderId = `order-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
         const grossAmount = 15000; // IDR 15.000
+
+        const itemDetails = [{
+            id: 'quota-100',
+            price: grossAmount,
+            quantity: 1,
+            name: '100 Use Quota'
+        }];
+
+        const customerDetails = {
+            first_name: firstName,
+            last_name: lastName,
+            email: email,
+            phone: phone,
+        };
 
         const payload = {
             transaction_details: {
                 order_id: orderId,
                 gross_amount: grossAmount,
             },
+            item_details: itemDetails,
+            customer_details: customerDetails,
             credit_card: {
                 secure: true,
             },
-            // You can add customer_details here if you want
         };
 
         // Call Midtrans API
@@ -55,6 +92,7 @@ serve(async (req: Request) => {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Accept': 'application/json',
                 'Authorization': `Basic ${btoa(midtransServerKey + ':')}`,
             },
             body: JSON.stringify(payload),
