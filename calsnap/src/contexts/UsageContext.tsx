@@ -11,7 +11,7 @@ interface UsageContextType {
     checkPaymentStatus: () => Promise<void>;
 }
 
-const MAX_FREE_USAGE = 5;
+const MAX_FREE_USAGE = 3;
 
 const UsageContext = createContext<UsageContextType | undefined>(undefined);
 

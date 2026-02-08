@@ -38,7 +38,7 @@ export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
                         // In production, this should be done via webhook to edge function.
                         try {
                             // Assuming user is authenticated if they paid
-                            const { error } = await import('../lib/supabase').then(m => m.supabase.rpc('add_credits', { credits_to_add: 100 }));
+                            const { error } = await import('../lib/supabase').then(m => m.supabase.rpc('add_credits', { credits_to_add: 10 }));
                             if (error) console.error('Error adding credits:', error);
                         } catch (err) {
                             console.error('Error calling rpc:', err);
@@ -90,7 +90,7 @@ export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
                     </h2>
                     <p className="text-gray-600 mb-8">
                         {isRefill
-                            ? "You've used all your credits. Add another 100 uses to continue."
+                            ? "You've used all your credits. Add another 10 uses to continue."
                             : "You've reached your free limit of 5 uploads. Upgrade to Premium to continue analyzing your schedules."}
                     </p>
 
@@ -99,7 +99,7 @@ export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
                             <div className="mt-1 bg-green-100 rounded-full p-1">
                                 <Check size={12} className="text-green-600" />
                             </div>
-                            <span className="text-sm text-gray-700">100 uploads per pack</span>
+                            <span className="text-sm text-gray-700">10 uploads per pack</span>
                         </div>
                         <div className="flex items-start gap-3">
                             <div className="mt-1 bg-green-100 rounded-full p-1">

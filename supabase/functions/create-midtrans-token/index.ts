@@ -1,5 +1,3 @@
-console.log("Midtrans Function Loading... [v3-init]");
-
 // @ts-ignore
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 // @ts-ignore
@@ -21,8 +19,6 @@ serve(async (req: Request) => {
     }
 
     try {
-        console.log("Function invoked [v2-debug]");
-
         // 2. Check Authorization Header
         const authHeader = req.headers.get('Authorization');
         if (!authHeader) {
@@ -52,7 +48,7 @@ serve(async (req: Request) => {
             throw new Error('Server configuration error');
         }
 
-        console.log(`Using Midtrans Environment: ${isProduction ? 'Production' : 'Sandbox'}`);
+
 
         // 4. Initialize Supabase Client
         // Remove 'global' headers here, we will pass token explicitly
@@ -67,10 +63,7 @@ serve(async (req: Request) => {
         );
 
         // 5. Get User Details
-        console.log("Fetching user details...");
         const token = authHeader.replace('Bearer ', '');
-
-        console.log(`Auth Header detected. Token length: ${token.length}`);
 
         const { data: { user }, error: userError } = await supabaseClient.auth.getUser(token);
 
@@ -105,10 +98,10 @@ serve(async (req: Request) => {
         const grossAmount = 15000;
 
         const itemDetails = [{
-            id: 'quota-100',
+            id: 'quota-10',
             price: grossAmount,
             quantity: 1,
-            name: '100 Use Quota'
+            name: '10 Use Quota'
         }];
 
         const customerDetails = {
@@ -131,8 +124,7 @@ serve(async (req: Request) => {
         };
 
         // 7. Call Midtrans API
-        console.log("Sending request to Midtrans...", { midtransUrl });
-
+        // 7. Call Midtrans API
         const midtransAuth = btoa(midtransServerKey + ':');
         const response = await fetch(midtransUrl, {
             method: 'POST',
