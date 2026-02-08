@@ -17,6 +17,10 @@ import { Toaster, toast } from 'sonner';
 import { Info, HelpCircle, ChevronDown, ChevronUp, Download } from 'lucide-react';
 import posthog from 'posthog-js';
 import { PRICING } from './lib/llm';
+import { useAuth } from './contexts/AuthContext';
+import { useUsage } from './contexts/UsageContext';
+import { PaywallModal } from './components/PaywallModal';
+import { User, LogOut } from 'lucide-react';
 
 // Initialize PostHog
 const POSTHOG_KEY = import.meta.env.VITE_POSTHOG_KEY;
@@ -32,6 +36,10 @@ if (POSTHOG_KEY && typeof window !== 'undefined') {
 
 function App() {
   const { t } = useLanguage();
+  const { user, signInWithGoogle, signOut } = useAuth();
+  const { canUpload, incrementUsage, usageCount, isPaid } = useUsage();
+  const [showPaywall, setShowPaywall] = useState(false);
+
   const [appState, setAppState] = useState<'upload' | 'processing' | 'results'>('upload');
   const [inputMethod, setInputMethod] = useState<'image' | 'text'>('image');
   const [processingStatus, setProcessingStatus] = useState<'uploading' | 'analyzing' | 'extracting'>('analyzing');
@@ -64,6 +72,11 @@ function App() {
   };
 
   const processFile = async (file: File) => {
+    if (!canUpload) {
+      setShowPaywall(true);
+      return;
+    }
+
     setAppState('processing');
     setProcessingStatus('uploading');
 
@@ -108,6 +121,7 @@ function App() {
       storage.saveEvents(extractedEvents);
       setEvents(extractedEvents);
       setAppState('results');
+      incrementUsage();
     } catch (err) {
       console.error(err);
       const errorMessage = err instanceof Error ? err.message : 'Failed to process image';
@@ -118,6 +132,11 @@ function App() {
   };
 
   const handleTextAnalyze = async (text: string) => {
+    if (!canUpload) {
+      setShowPaywall(true);
+      return;
+    }
+
     setAppState('processing');
     setProcessingStatus('analyzing');
 
@@ -150,6 +169,7 @@ function App() {
       storage.saveEvents(extractedEvents);
       setEvents(extractedEvents);
       setAppState('results');
+      incrementUsage();
     } catch (err) {
       console.error(err);
       const errorMessage = err instanceof Error ? err.message : 'Failed to analyze text';
@@ -233,14 +253,44 @@ function App() {
       <Toaster position="top-right" richColors />
       <ActivityLog />
       <div className="max-w-6xl mx-auto">
-        <header className="mb-12 text-center relative">
-          <div className="absolute top-0 right-0">
+        <header className="mb-8 md:mb-12 text-center relative flex flex-col items-center">
+          <div className="w-full flex justify-end items-center gap-3 mb-4 sm:absolute sm:top-0 sm:right-0 sm:mb-0">
+            {user ? (
+              <div className="flex items-center gap-2 bg-white rounded-full px-3 py-1 shadow-sm border border-gray-200">
+                {user.user_metadata?.avatar_url ? (
+                  <img src={user.user_metadata.avatar_url} alt="Profile" className="w-6 h-6 rounded-full" />
+                ) : (
+                  <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
+                    <User size={14} className="text-blue-600" />
+                  </div>
+                )}
+                <span className="text-sm font-medium text-gray-700 max-w-[80px] sm:max-w-none truncate">
+                  {user.user_metadata?.full_name?.split(' ')[0] || 'User'}
+                </span>
+                <button
+                  onClick={signOut}
+                  className="ml-1 text-gray-400 hover:text-red-500 transition-colors"
+                  title="Sign Out"
+                >
+                  <LogOut size={16} />
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={signInWithGoogle}
+                className="flex items-center gap-2 px-3 py-1.5 bg-gray-900 hover:bg-gray-800 text-white text-sm font-medium rounded-full transition-all shadow-sm"
+              >
+                <User size={14} />
+                <span className="hidden sm:inline">Sign In</span>
+                <span className="sm:hidden">Login</span>
+              </button>
+            )}
             <LanguageToggle />
           </div>
-          <h1 className="text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl mb-4">
+          <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl mb-4 mt-2 sm:mt-0">
             {t('app.title').replace('Snap', '')}<span className="text-blue-600">Snap</span>
           </h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto px-4">
             {t('app.subtitle')}
           </p>
         </header>
@@ -254,6 +304,19 @@ function App() {
 
           {appState === 'upload' && (
             <div className="w-full max-w-md mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
+              {/* Usage Limit Display for Free Users */}
+              {!isPaid && (
+                <div className="mb-6 text-center">
+                  <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border ${usageCount >= 5
+                    ? 'bg-red-50 text-red-700 border-red-100'
+                    : 'bg-gray-50 text-gray-600 border-gray-200'
+                    }`}>
+                    <span>Free Plan: {usageCount} / 5 uses</span>
+                    {usageCount >= 5 && <span className="font-bold ml-1">(Limit Reached)</span>}
+                  </span>
+                </div>
+              )}
+
               {/* Model Selector */}
               <div className="mb-6">
                 <div className="flex items-center justify-center gap-2 mb-2">
@@ -410,6 +473,7 @@ function App() {
           <p className="text-xs text-gray-300">No personal data is stored on our servers.</p>
         </footer>
       </div>
+      <PaywallModal isOpen={showPaywall} onClose={() => setShowPaywall(false)} />
     </div>
   );
 }

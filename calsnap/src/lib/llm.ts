@@ -5,8 +5,8 @@ import { logger } from './logger';
 export type ModelOption = 'google' | 'qwen';
 
 export const MODEL_OPTIONS: Record<ModelOption, { label: string; model: string }> = {
-    google: { label: 'Google', model: 'google/gemini-2.0-flash-001' },
-    qwen: { label: 'Qwen', model: 'qwen/qwen-2.5-vl-72b-instruct:free' }
+    google: { label: 'Google', model: 'google/gemini-3-flash-preview' },
+    qwen: { label: 'Qwen', model: 'qwen/qwen3-vl-235b-a22b-instruct' }
 };
 
 interface CompletionUsage {
@@ -17,8 +17,8 @@ interface CompletionUsage {
 
 // Pricing per 1M tokens (USD) - Approximate, based on OpenRouter/Provider pricing
 export const PRICING = {
-    google: { input: 0.10, output: 0.40 }, // Gemini 2.0 Flash
-    qwen: { input: 0, output: 0 } // Qwen 2.5 VL (Free tier on OpenRouter)
+    google: { input: 0.50, output: 3 }, // Gemini 3 Flash
+    qwen: { input: 0.2, output: 0.88 } // Qwen 3 VL ( OpenRouter)
 };
 
 export interface AnalysisResult {
