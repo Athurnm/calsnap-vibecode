@@ -61,7 +61,7 @@ export const ActivityLog: React.FC = () => {
                                     {format(log.timestamp, 'HH:mm:ss')}
                                 </span>
                                 <span className={`shrink-0 font-medium ${log.type === 'error' ? 'text-red-600' :
-                                    log.type === 'success' ? 'text-green-600' :
+                                    log.type === 'success' ? 'text-emerald-600' :
                                         log.type === 'warning' ? 'text-yellow-600' :
                                             'text-blue-600'
                                     }`}>

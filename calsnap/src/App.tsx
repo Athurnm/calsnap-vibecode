@@ -282,7 +282,7 @@ function App() {
             <LanguageToggle />
           </div>
           <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl mb-4 mt-2 sm:mt-0">
-            {t('app.title').replace('Snap', '')}<span className="text-blue-600">Snap</span>
+            {t('app.title').replace('Snap', '')}<span className="text-blue-500">Snap</span>
           </h1>
           <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto px-4">
             {t('app.subtitle')}
@@ -377,7 +377,7 @@ function App() {
             <div className="w-full">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full sm:w-auto">
-                  <div className="p-3 bg-green-50 text-green-700 rounded-lg inline-flex items-center gap-2 text-sm font-medium w-full sm:w-auto justify-center sm:justify-start">
+                  <div className="p-3 bg-emerald-50 text-emerald-700 rounded-lg inline-flex items-center gap-2 text-sm font-medium w-full sm:w-auto justify-center sm:justify-start">
                     <span>{t('results.foundEvents').replace('{count}', events.length.toString())}</span>
                   </div>
                   <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg text-xs font-medium animate-pulse w-full sm:w-auto justify-center sm:justify-start">
@@ -429,7 +429,7 @@ function App() {
                       <div className="grid sm:grid-cols-2 gap-6">
                         <div>
                           <h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
-                            <span className="px-2 py-0.5 bg-green-100 text-green-700 rounded text-xs">Android</span>
+                            <span className="px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded text-xs">Android</span>
                           </h4>
                           <ol className="list-decimal list-inside text-sm text-gray-600 space-y-2">
                             <li>Tap <span className="font-medium">Download</span> above.</li>

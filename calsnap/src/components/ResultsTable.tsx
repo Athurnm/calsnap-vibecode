@@ -157,7 +157,7 @@ const DateTimeEditor: React.FC<DateTimeEditorProps> = ({ date, endDate, startTim
                 <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-100">
                     <button
                         onClick={onCancel}
-                        className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors"
+                        className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-lg transition-colors"
                     >
                         {t('table.editor.cancel')}
                     </button>
@@ -316,7 +316,7 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({
                                                 href={generateGoogleCalendarUrl(event)}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="p-1.5 text-gray-400 hover:text-green-600 hover:bg-green-50 active:scale-95 rounded-md transition-all"
+                                                className="p-1.5 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 active:scale-95 rounded-md transition-all"
                                                 title="Add to Google Calendar"
                                                 aria-label={`Add event ${index + 1} to Google Calendar`}
                                                 onClick={() => {
@@ -376,7 +376,7 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({
                         <div
                             key={index}
                             className={`p-4 rounded-xl shadow-sm border transition-colors duration-300 space-y-3 ${isExported
-                                ? 'bg-green-50/80 border-green-200'
+                                ? 'bg-emerald-50/80 border-emerald-200'
                                 : 'bg-white border-gray-100'
                                 }`}
                         >
@@ -438,14 +438,14 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({
                             />
 
                             {/* Actions - moved to bottom */}
-                            <div className={`flex flex-col gap-2 pt-2 border-t ${isExported ? 'border-green-200' : 'border-gray-50'}`}>
+                            <div className={`flex flex-col gap-2 pt-2 border-t ${isExported ? 'border-emerald-200' : 'border-gray-50'}`}>
                                 <a
                                     href={generateGoogleCalendarUrl(event)}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className={`w-full py-2.5 px-4 rounded-lg font-medium flex items-center justify-center gap-2 transition-all shadow-sm ${isExported
-                                        ? 'bg-green-100 text-green-700 hover:bg-green-200'
-                                        : 'bg-green-600 text-white hover:bg-green-700 hover:shadow-md'
+                                        ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'
+                                        : 'bg-emerald-600 text-white hover:bg-emerald-700 hover:shadow-md'
                                         }`}
                                     title="Add to Google Calendar"
                                     onClick={() => {
@@ -465,7 +465,7 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({
                                             logger.info(`Duplicated event: ${event.activity}`);
                                         }}
                                         className={`flex-1 py-2 px-4 rounded-lg font-medium flex items-center justify-center gap-2 transition-all border ${isExported
-                                            ? 'bg-white/60 text-gray-600 border-green-200 hover:bg-white'
+                                            ? 'bg-white/60 text-gray-600 border-emerald-200 hover:bg-white'
                                             : 'bg-gray-50 text-gray-600 border-gray-100 hover:bg-blue-50 hover:text-blue-600'
                                             }`}
                                         aria-label={`Duplicate event ${index + 1}`}
@@ -476,7 +476,7 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({
                                     <button
                                         onClick={() => onDelete(index)}
                                         className={`flex-1 py-2 px-4 rounded-lg font-medium flex items-center justify-center gap-2 transition-all border ${isExported
-                                            ? 'bg-white/60 text-gray-600 border-green-200 hover:bg-red-50 hover:text-red-600'
+                                            ? 'bg-white/60 text-gray-600 border-emerald-200 hover:bg-red-50 hover:text-red-600'
                                             : 'bg-gray-50 text-gray-600 border-gray-100 hover:bg-red-50 hover:text-red-600'
                                             }`}
                                         aria-label={`Delete event ${index + 1}`}
