@@ -47,118 +47,128 @@ const DateTimeEditor: React.FC<DateTimeEditorProps> = ({ date, endDate, startTim
     };
 
     return (
-        <div className="absolute z-10 top-full left-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg p-3 min-w-[280px]">
-            <div className="space-y-3">
-                {/* Start Date */}
-                <div>
-                    <label className="text-xs text-gray-500 mb-1 block">{t('table.editor.start_date')}</label>
-                    <input
-                        type="date"
-                        value={editDate}
-                        onChange={(e) => setEditDate(e.target.value)}
-                        className="w-full px-2 py-1 border border-gray-200 rounded text-sm"
-                        aria-label="Event start date"
-                    />
-                </div>
 
-                {/* End Date (optional) */}
-                <div>
-                    <label className="text-xs text-gray-500 mb-1 block">{t('table.editor.end_date')}</label>
-                    <input
-                        type="date"
-                        value={editEndDate}
-                        onChange={(e) => setEditEndDate(e.target.value)}
-                        min={editDate}
-                        className="w-full px-2 py-1 border border-gray-200 rounded text-sm"
-                        aria-label="Event end date"
-                        placeholder="Same as start date"
-                    />
-                </div>
-
-                {/* All Day Checkbox */}
-                <div className="flex items-center gap-2">
-                    <input
-                        type="checkbox"
-                        id="allDay"
-                        checked={isAllDay}
-                        onChange={(e) => setIsAllDay(e.target.checked)}
-                        className="rounded border-gray-300"
-                    />
-                    <label htmlFor="allDay" className="text-sm text-gray-600">{t('table.editor.all_day')}</label>
-                </div>
-
-                {/* Time Inputs */}
-                {!isAllDay && (
-                    <div className="flex gap-2">
-                        <div className="flex-1">
-                            <label className="text-xs text-gray-500 mb-1 block">{t('table.editor.start_time')}</label>
-                            <input
-                                type="time"
-                                value={editStart}
-                                onChange={(e) => setEditStart(e.target.value)}
-                                className="w-full px-2 py-1 border border-gray-200 rounded text-sm"
-                                aria-label="Start time"
-                            />
-                        </div>
-                        <div className="flex-1">
-                            <label className="text-xs text-gray-500 mb-1 block">{t('table.editor.end_time')}</label>
-                            <input
-                                type="time"
-                                value={editEnd}
-                                onChange={(e) => setEditEnd(e.target.value)}
-                                className="w-full px-2 py-1 border border-gray-200 rounded text-sm"
-                                aria-label="End time"
-                            />
-                        </div>
-                    </div>
-                )}
-
-                {/* Recurring Options (Collapsible) */}
-                <div className="border-t border-gray-100 pt-3">
-                    <button
-                        type="button"
-                        onClick={() => setShowRecurrence(!showRecurrence)}
-                        className="flex items-center justify-between w-full text-sm text-gray-600 hover:text-gray-900"
-                    >
-                        <span>{t('table.editor.recurrence')}</span>
-                        <span className="text-xs">{showRecurrence ? '▲' : '▼'}</span>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/25 backdrop-blur-sm animate-in fade-in" onClick={onCancel}>
+            <div
+                className="bg-white border border-gray-200 rounded-xl shadow-2xl p-4 min-w-[300px] max-w-sm w-full animate-in zoom-in-95"
+                onClick={e => e.stopPropagation()}
+            >
+                <div className="flex justify-between items-center mb-4 pb-2 border-b border-gray-100">
+                    <h3 className="font-semibold text-gray-900">{t('table.dateTime')}</h3>
+                    <button onClick={onCancel} className="text-gray-400 hover:text-gray-600 transition-colors">
+                        <X size={18} />
                     </button>
-                    {showRecurrence && (
-                        <div className="mt-2">
-                            <select
-                                value={editRecurrence}
-                                onChange={(e) => setEditRecurrence(e.target.value as 'none' | 'daily' | 'weekly' | 'monthly')}
-                                className="w-full px-2 py-1 border border-gray-200 rounded text-sm"
-                                aria-label="Recurrence pattern"
-                            >
-                                <option value="none">{t('table.editor.recurrence.none')}</option>
-                                <option value="daily">{t('table.editor.recurrence.daily')}</option>
-                                <option value="weekly">{t('table.editor.recurrence.weekly')}</option>
-                                <option value="monthly">{t('table.editor.recurrence.monthly')}</option>
-                            </select>
+                </div>
+
+                <div className="space-y-4">
+                    {/* Start Date */}
+                    <div>
+                        <label className="text-xs font-medium text-gray-500 mb-1.5 block">{t('table.editor.start_date')}</label>
+                        <input
+                            type="date"
+                            value={editDate}
+                            onChange={(e) => setEditDate(e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none"
+                            aria-label="Event start date"
+                        />
+                    </div>
+
+                    {/* End Date (optional) */}
+                    <div>
+                        <label className="text-xs font-medium text-gray-500 mb-1.5 block">{t('table.editor.end_date')}</label>
+                        <input
+                            type="date"
+                            value={editEndDate}
+                            onChange={(e) => setEditEndDate(e.target.value)}
+                            min={editDate}
+                            className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none"
+                            aria-label="Event end date"
+                            placeholder="Same as start date"
+                        />
+                    </div>
+
+                    {/* All Day Checkbox */}
+                    <div className="flex items-center gap-2">
+                        <input
+                            type="checkbox"
+                            id="allDay"
+                            checked={isAllDay}
+                            onChange={(e) => setIsAllDay(e.target.checked)}
+                            className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        />
+                        <label htmlFor="allDay" className="text-sm text-gray-700 cursor-pointer select-none">{t('table.editor.all_day')}</label>
+                    </div>
+
+                    {/* Time Inputs */}
+                    {!isAllDay && (
+                        <div className="flex gap-3">
+                            <div className="flex-1">
+                                <label className="text-xs font-medium text-gray-500 mb-1.5 block">{t('table.editor.start_time')}</label>
+                                <input
+                                    type="time"
+                                    value={editStart}
+                                    onChange={(e) => setEditStart(e.target.value)}
+                                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none"
+                                    aria-label="Start time"
+                                />
+                            </div>
+                            <div className="flex-1">
+                                <label className="text-xs font-medium text-gray-500 mb-1.5 block">{t('table.editor.end_time')}</label>
+                                <input
+                                    type="time"
+                                    value={editEnd}
+                                    onChange={(e) => setEditEnd(e.target.value)}
+                                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none"
+                                    aria-label="End time"
+                                />
+                            </div>
                         </div>
                     )}
-                </div>
-            </div>
 
-            {/* Action Buttons */}
-            <div className="flex justify-end gap-2 mt-3 pt-2 border-t border-gray-100">
-                <button
-                    onClick={onCancel}
-                    className="p-1.5 text-gray-400 hover:text-gray-600 rounded"
-                    title={t('table.editor.cancel')}
-                    aria-label="Cancel editing"
-                >
-                    <X size={16} />
-                </button>
-                <button
-                    onClick={handleSave}
-                    className="p-1.5 text-blue-600 hover:text-blue-700 rounded"
-                    title={t('table.editor.save')}
-                    aria-label="Save date and time"
-                >
-                    <Check size={16} />
-                </button>
+                    {/* Recurring Options (Collapsible) */}
+                    <div className="pt-2">
+                        <button
+                            type="button"
+                            onClick={() => setShowRecurrence(!showRecurrence)}
+                            className="flex items-center justify-between w-full text-sm text-gray-600 hover:text-gray-900 bg-gray-50 p-2 rounded-lg"
+                        >
+                            <span className="font-medium">{t('table.editor.recurrence')}</span>
+                            <span className="text-xs">{showRecurrence ? '▲' : '▼'}</span>
+                        </button>
+                        {showRecurrence && (
+                            <div className="mt-2 animate-in slide-in-from-top-2">
+                                <select
+                                    value={editRecurrence}
+                                    onChange={(e) => setEditRecurrence(e.target.value as 'none' | 'daily' | 'weekly' | 'monthly')}
+                                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none"
+                                    aria-label="Recurrence pattern"
+                                >
+                                    <option value="none">{t('table.editor.recurrence.none')}</option>
+                                    <option value="daily">{t('table.editor.recurrence.daily')}</option>
+                                    <option value="weekly">{t('table.editor.recurrence.weekly')}</option>
+                                    <option value="monthly">{t('table.editor.recurrence.monthly')}</option>
+                                </select>
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-100">
+                    <button
+                        onClick={onCancel}
+                        className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors"
+                    >
+                        {t('table.editor.cancel')}
+                    </button>
+                    <button
+                        onClick={handleSave}
+                        className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm shadow-blue-200 transition-colors flex items-center gap-2"
+                    >
+                        <Check size={16} />
+                        {t('table.editor.save')}
+                    </button>
+                </div>
             </div>
         </div>
     );

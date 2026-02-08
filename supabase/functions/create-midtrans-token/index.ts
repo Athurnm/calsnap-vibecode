@@ -121,6 +121,7 @@ serve(async (req: Request) => {
             credit_card: {
                 secure: true,
             },
+            custom_field1: user.id,
         };
 
         // 7. Call Midtrans API

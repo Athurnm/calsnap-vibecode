@@ -81,10 +81,7 @@ function App() {
     setProcessingStatus('uploading');
 
     try {
-      const apiKey = import.meta.env.VITE_OPENROUTER_API_KEY;
-      if (!apiKey) {
-        throw new Error('API Configuration Error: No API key found in environment.');
-      }
+      // API Key is now handled securely in the Edge Function
 
       const base64 = await new Promise<string>((resolve, reject) => {
         const reader = new FileReader();
@@ -96,7 +93,7 @@ function App() {
       storage.saveImage(base64);
       setProcessingStatus('analyzing');
 
-      const { events: extractedEvents, usage } = await analyzeScheduleImage(base64, apiKey, selectedModel);
+      const { events: extractedEvents, usage } = await analyzeScheduleImage(base64, selectedModel);
 
       // Calculate Cost
       let cost = 0;
@@ -141,10 +138,7 @@ function App() {
     setProcessingStatus('analyzing');
 
     try {
-      const apiKey = import.meta.env.VITE_OPENROUTER_API_KEY;
-      if (!apiKey) throw new Error('API Configuration Error: No API key found.');
-
-      const { events: extractedEvents, usage } = await analyzeScheduleText(text, apiKey, selectedModel);
+      const { events: extractedEvents, usage } = await analyzeScheduleText(text, selectedModel);
 
       // Calculate Cost
       let cost = 0;

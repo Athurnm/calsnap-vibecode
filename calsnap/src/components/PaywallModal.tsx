@@ -33,18 +33,8 @@ export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
                         console.log('Payment success', result);
                         toast.success(t('paywall.success'));
 
-                        // Optimistically update or call RPC to add credits
-                        // For now we rely on the manual check, but since we don't have a webhook listener updating DB instantly,
-                        // checking profile might not show changes yet unless the backend updated it.
-                        // We will call the add_credits RPC from here for immediate update (client-side trust for MVP)
-                        // In production, this should be done via webhook to edge function.
-                        try {
-                            // Assuming user is authenticated if they paid
-                            const { error } = await import('../lib/supabase').then(m => m.supabase.rpc('add_credits', { credits_to_add: 10 }));
-                            if (error) console.error('Error adding credits:', error);
-                        } catch (err) {
-                            console.error('Error calling rpc:', err);
-                        }
+                        // Credits are now added via Webhook (Server-side)
+                        toast.info("Updating your credits..."); // Feedback to user
 
                         await checkPaymentStatus(); // Refresh status
                         onClose();
