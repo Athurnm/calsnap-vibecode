@@ -19,7 +19,7 @@ export const ProcessingState: React.FC<ProcessingStateProps> = ({ status }) => {
     ];
 
     const messages = {
-        uploading: 'Uploading your schedule...', // TODO: Add to translations if needed, or keep dynamic status messages separate
+        uploading: t('processing.uploading'),
         analyzing: t('processing.analyzing'),
         extracting: t('processing.extracting'),
     };

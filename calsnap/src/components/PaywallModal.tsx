@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useUsage } from '../contexts/UsageContext';
+import { useLanguage } from '../context/LanguageContextCore';
 import { createTransaction, loadSnapScript } from '../services/payment';
 import { X, Check } from 'lucide-react';
 import { toast } from 'sonner';
@@ -11,6 +12,7 @@ interface PaywallModalProps {
 }
 
 export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
+    const { t } = useLanguage();
     const { user, signInWithGoogle } = useAuth();
     const { checkPaymentStatus, usageLimit } = useUsage();
     const [loading, setLoading] = React.useState(false);
@@ -29,7 +31,7 @@ export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
                 window.snap.pay(token, {
                     onSuccess: async (result: any) => {
                         console.log('Payment success', result);
-                        toast.success('Payment successful! Credits added.');
+                        toast.success(t('paywall.success'));
 
                         // Optimistically update or call RPC to add credits
                         // For now we rely on the manual check, but since we don't have a webhook listener updating DB instantly,
@@ -49,22 +51,22 @@ export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
                     },
                     onPending: (result: any) => {
                         console.log('Payment pending', result);
-                        toast.info('Payment pending. Please complete payment.');
+                        toast.info(t('paywall.pending'));
                     },
                     onError: (result: any) => {
                         console.error('Payment error', result);
-                        toast.error('Payment failed. Please try again.');
+                        toast.error(t('paywall.error'));
                     },
                     onClose: () => {
                         console.log('Customer closed the popup without finishing payment');
                     }
                 });
             } else {
-                toast.error('Payment system not initialized. Please try again later.');
+                toast.error(t('paywall.error.system'));
             }
         } catch (error) {
             console.error(error);
-            toast.error('Failed to initiate payment.');
+            toast.error(t('paywall.error.init'));
         } finally {
             setLoading(false);
         }
@@ -86,12 +88,12 @@ export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
                     </div>
 
                     <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                        {isRefill ? 'Out of Credits?' : 'Unlock Unlimited Uploads'}
+                        {isRefill ? t('paywall.title.refill') : t('paywall.title')}
                     </h2>
                     <p className="text-gray-600 mb-8">
                         {isRefill
-                            ? "You've used all your credits. Add another 10 uses to continue."
-                            : "You've reached your free limit of 5 uploads. Upgrade to Premium to continue analyzing your schedules."}
+                            ? t('paywall.subtitle.refill')
+                            : t('paywall.subtitle')}
                     </p>
 
                     <div className="space-y-4 mb-8 text-left bg-gray-50 p-6 rounded-xl border border-gray-100">
@@ -99,19 +101,19 @@ export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
                             <div className="mt-1 bg-green-100 rounded-full p-1">
                                 <Check size={12} className="text-green-600" />
                             </div>
-                            <span className="text-sm text-gray-700">10 uploads per pack</span>
+                            <span className="text-sm text-gray-700">{t('paywall.benefit.1')}</span>
                         </div>
                         <div className="flex items-start gap-3">
                             <div className="mt-1 bg-green-100 rounded-full p-1">
                                 <Check size={12} className="text-green-600" />
                             </div>
-                            <span className="text-sm text-gray-700">Support for Image & Text processing</span>
+                            <span className="text-sm text-gray-700">{t('paywall.benefit.2')}</span>
                         </div>
                         <div className="flex items-start gap-3">
                             <div className="mt-1 bg-green-100 rounded-full p-1">
                                 <Check size={12} className="text-green-600" />
                             </div>
-                            <span className="text-sm text-gray-700">Premium support</span>
+                            <span className="text-sm text-gray-700">{t('paywall.benefit.3')}</span>
                         </div>
                     </div>
 
@@ -122,10 +124,10 @@ export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
                                 disabled={loading}
                                 className="w-full py-3 px-4 bg-gray-900 hover:bg-gray-800 text-white rounded-xl font-medium transition-colors shadow-lg shadow-gray-200"
                             >
-                                Sign in to Upgrade
+                                {t('paywall.signin')}
                             </button>
                             <p className="text-xs text-gray-500 mt-2">
-                                You need to sign in first to associate your subscription.
+                                {t('paywall.signin.note')}
                             </p>
                         </div>
                     ) : (
@@ -136,21 +138,21 @@ export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
                                     disabled={loading}
                                     className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-colors shadow-lg shadow-blue-200 flex items-center justify-center gap-2"
                                 >
-                                    {loading ? 'Processing...' : `Upgrade for IDR 15.000`}
+                                    {loading ? t('paywall.processing') : t('paywall.upgrade')}
                                 </button>
                             ) : (
                                 <button
                                     disabled
                                     className="w-full py-3 px-4 bg-gray-100 text-gray-400 rounded-xl font-medium cursor-not-allowed flex items-center justify-center gap-2"
                                 >
-                                    Payments Temporarily Disabled
+                                    {t('paywall.disabled')}
                                 </button>
                             )}
                         </>
                     )}
 
                     <p className="mt-6 text-xs text-gray-400">
-                        Secure payment via Midtrans QRIS / E-Wallet
+                        {t('paywall.secure')}
                     </p>
                 </div>
             </div>

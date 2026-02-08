@@ -97,7 +97,7 @@ export const UploadZone: React.FC<UploadZoneProps> = ({ onFileSelect, isProcessi
                         <div className="absolute inset-0 bg-white/50 backdrop-blur-[2px] flex items-center justify-center">
                             <div className="flex flex-col items-center gap-3">
                                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                                <p className="text-sm font-medium text-gray-700">Processing schedule...</p>
+                                <p className="text-sm font-medium text-gray-700">{t('processing.schedule')}</p>
                             </div>
                         </div>
                     )}

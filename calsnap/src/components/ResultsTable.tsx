@@ -29,6 +29,7 @@ interface DateTimeEditorProps {
 }
 
 const DateTimeEditor: React.FC<DateTimeEditorProps> = ({ date, endDate, startTime, endTime, recurrence, onSave, onCancel }) => {
+    const { t } = useLanguage();
     const [editDate, setEditDate] = useState(date || new Date().toISOString().split('T')[0]);
     const [editEndDate, setEditEndDate] = useState(endDate || '');
     const [editStart, setEditStart] = useState(startTime || '');
@@ -50,7 +51,7 @@ const DateTimeEditor: React.FC<DateTimeEditorProps> = ({ date, endDate, startTim
             <div className="space-y-3">
                 {/* Start Date */}
                 <div>
-                    <label className="text-xs text-gray-500 mb-1 block">Start Date</label>
+                    <label className="text-xs text-gray-500 mb-1 block">{t('table.editor.start_date')}</label>
                     <input
                         type="date"
                         value={editDate}
@@ -62,7 +63,7 @@ const DateTimeEditor: React.FC<DateTimeEditorProps> = ({ date, endDate, startTim
 
                 {/* End Date (optional) */}
                 <div>
-                    <label className="text-xs text-gray-500 mb-1 block">End Date (optional)</label>
+                    <label className="text-xs text-gray-500 mb-1 block">{t('table.editor.end_date')}</label>
                     <input
                         type="date"
                         value={editEndDate}
@@ -83,14 +84,14 @@ const DateTimeEditor: React.FC<DateTimeEditorProps> = ({ date, endDate, startTim
                         onChange={(e) => setIsAllDay(e.target.checked)}
                         className="rounded border-gray-300"
                     />
-                    <label htmlFor="allDay" className="text-sm text-gray-600">All day</label>
+                    <label htmlFor="allDay" className="text-sm text-gray-600">{t('table.editor.all_day')}</label>
                 </div>
 
                 {/* Time Inputs */}
                 {!isAllDay && (
                     <div className="flex gap-2">
                         <div className="flex-1">
-                            <label className="text-xs text-gray-500 mb-1 block">Start</label>
+                            <label className="text-xs text-gray-500 mb-1 block">{t('table.editor.start_time')}</label>
                             <input
                                 type="time"
                                 value={editStart}
@@ -100,7 +101,7 @@ const DateTimeEditor: React.FC<DateTimeEditorProps> = ({ date, endDate, startTim
                             />
                         </div>
                         <div className="flex-1">
-                            <label className="text-xs text-gray-500 mb-1 block">End</label>
+                            <label className="text-xs text-gray-500 mb-1 block">{t('table.editor.end_time')}</label>
                             <input
                                 type="time"
                                 value={editEnd}
@@ -119,7 +120,7 @@ const DateTimeEditor: React.FC<DateTimeEditorProps> = ({ date, endDate, startTim
                         onClick={() => setShowRecurrence(!showRecurrence)}
                         className="flex items-center justify-between w-full text-sm text-gray-600 hover:text-gray-900"
                     >
-                        <span>Recurring Options</span>
+                        <span>{t('table.editor.recurrence')}</span>
                         <span className="text-xs">{showRecurrence ? '▲' : '▼'}</span>
                     </button>
                     {showRecurrence && (
@@ -130,10 +131,10 @@ const DateTimeEditor: React.FC<DateTimeEditorProps> = ({ date, endDate, startTim
                                 className="w-full px-2 py-1 border border-gray-200 rounded text-sm"
                                 aria-label="Recurrence pattern"
                             >
-                                <option value="none">None</option>
-                                <option value="daily">Daily</option>
-                                <option value="weekly">Weekly</option>
-                                <option value="monthly">Monthly</option>
+                                <option value="none">{t('table.editor.recurrence.none')}</option>
+                                <option value="daily">{t('table.editor.recurrence.daily')}</option>
+                                <option value="weekly">{t('table.editor.recurrence.weekly')}</option>
+                                <option value="monthly">{t('table.editor.recurrence.monthly')}</option>
                             </select>
                         </div>
                     )}
@@ -145,7 +146,7 @@ const DateTimeEditor: React.FC<DateTimeEditorProps> = ({ date, endDate, startTim
                 <button
                     onClick={onCancel}
                     className="p-1.5 text-gray-400 hover:text-gray-600 rounded"
-                    title="Cancel"
+                    title={t('table.editor.cancel')}
                     aria-label="Cancel editing"
                 >
                     <X size={16} />
@@ -153,7 +154,7 @@ const DateTimeEditor: React.FC<DateTimeEditorProps> = ({ date, endDate, startTim
                 <button
                     onClick={handleSave}
                     className="p-1.5 text-blue-600 hover:text-blue-700 rounded"
-                    title="Save"
+                    title={t('table.editor.save')}
                     aria-label="Save date and time"
                 >
                     <Check size={16} />
@@ -444,7 +445,7 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({
                                     }}
                                 >
                                     <Calendar size={18} />
-                                    <span>{isExported ? 'Added to Calendar' : '+ Google Calendar'}</span>
+                                    <span>{isExported ? t('table.gcal.added') : t('table.gcal.add')}</span>
                                 </a>
 
                                 <div className="flex gap-2">
@@ -460,7 +461,7 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({
                                         aria-label={`Duplicate event ${index + 1}`}
                                     >
                                         <Copy size={18} />
-                                        <span className="text-sm">Duplicate</span>
+                                        <span className="text-sm">{t('action.duplicate')}</span>
                                     </button>
                                     <button
                                         onClick={() => onDelete(index)}
@@ -471,7 +472,7 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({
                                         aria-label={`Delete event ${index + 1}`}
                                     >
                                         <Trash2 size={18} />
-                                        <span className="text-sm">Delete</span>
+                                        <span className="text-sm">{t('action.delete')}</span>
                                     </button>
                                 </div>
                             </div>

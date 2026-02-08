@@ -326,8 +326,8 @@ function App() {
                     <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 bg-gray-900 text-white text-xs rounded-lg p-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10 shadow-lg cursor-help">
                       <p className="font-semibold mb-1">{t('model.tooltip.title')}</p>
                       <ul className="list-disc pl-4 space-y-1">
-                        <li><strong>Qwen 2.5 VL</strong>: {t('model.tooltip.qwen').replace('Qwen 2.5 VL: ', '')}</li>
-                        <li><strong>Gemini 2.0 Flash</strong>: {t('model.tooltip.gemini').replace('Gemini 2.0 Flash: ', '')}</li>
+                        <li><strong>Qwen 3 VL</strong>: {t('model.tooltip.qwen').replace('Qwen 3 VL: ', '')}</li>
+                        <li><strong>Gemini 3.0 Flash</strong>: {t('model.tooltip.gemini').replace('Gemini 3.0 Flash: ', '')}</li>
                       </ul>
                       <div className="absolute bottom-[-4px] left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-900 rotate-45"></div>
                     </div>

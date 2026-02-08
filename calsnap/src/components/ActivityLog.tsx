@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronDown, ChevronUp, Copy, Terminal } from 'lucide-react';
 import { format } from 'date-fns';
+import { useLanguage } from '../context/LanguageContextCore';
 
 import { logger, type LogEntry } from '../lib/logger';
 
 export const ActivityLog: React.FC = () => {
     const [logs, setLogs] = useState<LogEntry[]>([]);
     const [isOpen, setIsOpen] = useState(false);
+
+    const { t } = useLanguage();
 
     useEffect(() => {
         const unsubscribe = logger.subscribe((entry) => {
@@ -32,7 +35,7 @@ export const ActivityLog: React.FC = () => {
                     >
                         <div className="flex items-center gap-2 text-xs font-semibold text-gray-700 uppercase tracking-wide">
                             <Terminal size={14} className="text-gray-500" />
-                            Activity Log
+                            {t('activity.title')}
                             <span className="bg-gray-200 text-gray-600 px-1.5 py-0.5 rounded-full text-[10px] min-w-[20px] text-center">
                                 {logs.length}
                             </span>
@@ -42,7 +45,7 @@ export const ActivityLog: React.FC = () => {
                                 <button
                                     onClick={(e) => { e.stopPropagation(); copyLogs(); }}
                                     className="p-1 hover:bg-gray-200 rounded text-gray-500 hover:text-gray-700"
-                                    title="Copy logs"
+                                    title={t('activity.copy')}
                                 >
                                     <Copy size={14} />
                                 </button>
