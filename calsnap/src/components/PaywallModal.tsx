@@ -12,8 +12,9 @@ interface PaywallModalProps {
 
 export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
     const { user, signInWithGoogle } = useAuth();
-    const { checkPaymentStatus } = useUsage();
+    const { checkPaymentStatus, usageLimit } = useUsage();
     const [loading, setLoading] = React.useState(false);
+    const isRefill = usageLimit > 5;
 
     if (!isOpen) return null;
 
@@ -28,7 +29,21 @@ export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
                 window.snap.pay(token, {
                     onSuccess: async (result: any) => {
                         console.log('Payment success', result);
-                        toast.success('Payment successful! You are now a premium member.');
+                        toast.success('Payment successful! Credits added.');
+
+                        // Optimistically update or call RPC to add credits
+                        // For now we rely on the manual check, but since we don't have a webhook listener updating DB instantly,
+                        // checking profile might not show changes yet unless the backend updated it.
+                        // We will call the add_credits RPC from here for immediate update (client-side trust for MVP)
+                        // In production, this should be done via webhook to edge function.
+                        try {
+                            // Assuming user is authenticated if they paid
+                            const { error } = await import('../lib/supabase').then(m => m.supabase.rpc('add_credits', { credits_to_add: 100 }));
+                            if (error) console.error('Error adding credits:', error);
+                        } catch (err) {
+                            console.error('Error calling rpc:', err);
+                        }
+
                         await checkPaymentStatus(); // Refresh status
                         onClose();
                     },
@@ -71,10 +86,12 @@ export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
                     </div>
 
                     <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                        Unlock Unlimited Uploads
+                        {isRefill ? 'Out of Credits?' : 'Unlock Unlimited Uploads'}
                     </h2>
                     <p className="text-gray-600 mb-8">
-                        You've reached your free limit of 5 uploads. Upgrade to Premium to continue analyzing your schedules.
+                        {isRefill
+                            ? "You've used all your credits. Add another 100 uses to continue."
+                            : "You've reached your free limit of 5 uploads. Upgrade to Premium to continue analyzing your schedules."}
                     </p>
 
                     <div className="space-y-4 mb-8 text-left bg-gray-50 p-6 rounded-xl border border-gray-100">
@@ -82,7 +99,7 @@ export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
                             <div className="mt-1 bg-green-100 rounded-full p-1">
                                 <Check size={12} className="text-green-600" />
                             </div>
-                            <span className="text-sm text-gray-700">100 uploads per month</span>
+                            <span className="text-sm text-gray-700">100 uploads per pack</span>
                         </div>
                         <div className="flex items-start gap-3">
                             <div className="mt-1 bg-green-100 rounded-full p-1">
@@ -119,7 +136,7 @@ export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
                                     disabled={loading}
                                     className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-colors shadow-lg shadow-blue-200 flex items-center justify-center gap-2"
                                 >
-                                    {loading ? 'Processing...' : 'Upgrade for IDR 15.000'}
+                                    {loading ? 'Processing...' : `Upgrade for IDR 15.000`}
                                 </button>
                             ) : (
                                 <button

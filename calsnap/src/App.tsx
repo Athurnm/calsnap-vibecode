@@ -37,7 +37,7 @@ if (POSTHOG_KEY && typeof window !== 'undefined') {
 function App() {
   const { t } = useLanguage();
   const { user, signInWithGoogle, signOut } = useAuth();
-  const { canUpload, incrementUsage, usageCount, isPaid } = useUsage();
+  const { canUpload, incrementUsage, usageCount, usageLimit, isPaid } = useUsage();
   const [showPaywall, setShowPaywall] = useState(false);
 
   const [appState, setAppState] = useState<'upload' | 'processing' | 'results'>('upload');
@@ -304,18 +304,16 @@ function App() {
 
           {appState === 'upload' && (
             <div className="w-full max-w-md mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
-              {/* Usage Limit Display for Free Users */}
-              {!isPaid && (
-                <div className="mb-6 text-center">
-                  <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border ${usageCount >= 5
-                    ? 'bg-red-50 text-red-700 border-red-100'
-                    : 'bg-gray-50 text-gray-600 border-gray-200'
-                    }`}>
-                    <span>Free Plan: {usageCount} / 5 uses</span>
-                    {usageCount >= 5 && <span className="font-bold ml-1">(Limit Reached)</span>}
-                  </span>
-                </div>
-              )}
+              {/* Usage Limit Display */}
+              <div className="mb-6 text-center">
+                <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border ${usageCount >= usageLimit
+                  ? 'bg-red-50 text-red-700 border-red-100'
+                  : 'bg-gray-50 text-gray-600 border-gray-200'
+                  }`}>
+                  <span>{isPaid ? 'Premium Plan:' : 'Free Plan:'} {usageCount} / {usageLimit} uses</span>
+                  {usageCount >= usageLimit && <span className="font-bold ml-1">(Limit Reached)</span>}
+                </span>
+              </div>
 
               {/* Model Selector */}
               <div className="mb-6">
