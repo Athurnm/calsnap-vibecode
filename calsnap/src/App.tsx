@@ -15,6 +15,20 @@ import { generateIcsFile } from './lib/export';
 import type { CalendarEvent } from './types';
 import { Toaster, toast } from 'sonner';
 import { Info, HelpCircle, ChevronDown, ChevronUp, Download } from 'lucide-react';
+import posthog from 'posthog-js';
+import { PRICING } from './lib/llm';
+
+// Initialize PostHog
+const POSTHOG_KEY = import.meta.env.VITE_POSTHOG_KEY;
+const POSTHOG_HOST = import.meta.env.VITE_POSTHOG_HOST;
+
+if (POSTHOG_KEY && typeof window !== 'undefined') {
+  posthog.init(POSTHOG_KEY, {
+    api_host: POSTHOG_HOST || 'https://us.i.posthog.com',
+    person_profiles: 'identified_only',
+    capture_pageview: false // We verify manually
+  });
+}
 
 function App() {
   const { t } = useLanguage();
@@ -27,6 +41,12 @@ function App() {
   const [showImportHelp, setShowImportHelp] = useState(false);
 
   useEffect(() => {
+    // Register super properties
+    posthog.register({ product: 'calsnap' });
+
+    // Track pageview on mount
+    posthog.capture('$pageview');
+
     try {
       const savedEvents = storage.getEvents();
       if (savedEvents && savedEvents.length > 0) {
@@ -63,7 +83,28 @@ function App() {
       storage.saveImage(base64);
       setProcessingStatus('analyzing');
 
-      const extractedEvents = await analyzeScheduleImage(base64, apiKey, selectedModel);
+      const { events: extractedEvents, usage } = await analyzeScheduleImage(base64, apiKey, selectedModel);
+
+      // Calculate Cost
+      let cost = 0;
+      if (usage) {
+        const pricing = PRICING[selectedModel];
+        const inputCost = (usage.prompt_tokens / 1_000_000) * pricing.input;
+        const outputCost = (usage.completion_tokens / 1_000_000) * pricing.output;
+        cost = inputCost + outputCost;
+      }
+
+      // Track Event
+      posthog.capture('process_completed', {
+        type: 'image',
+        model: selectedModel,
+        tokens_input: usage?.prompt_tokens ?? 0,
+        tokens_output: usage?.completion_tokens ?? 0,
+        total_tokens: usage?.total_tokens ?? 0,
+        cost_usd: cost,
+        event_count: extractedEvents.length
+      });
+
       storage.saveEvents(extractedEvents);
       setEvents(extractedEvents);
       setAppState('results');
@@ -84,7 +125,28 @@ function App() {
       const apiKey = import.meta.env.VITE_OPENROUTER_API_KEY;
       if (!apiKey) throw new Error('API Configuration Error: No API key found.');
 
-      const extractedEvents = await analyzeScheduleText(text, apiKey, selectedModel);
+      const { events: extractedEvents, usage } = await analyzeScheduleText(text, apiKey, selectedModel);
+
+      // Calculate Cost
+      let cost = 0;
+      if (usage) {
+        const pricing = PRICING[selectedModel];
+        const inputCost = (usage.prompt_tokens / 1_000_000) * pricing.input;
+        const outputCost = (usage.completion_tokens / 1_000_000) * pricing.output;
+        cost = inputCost + outputCost;
+      }
+
+      // Track Event
+      posthog.capture('process_completed', {
+        type: 'text',
+        model: selectedModel,
+        tokens_input: usage?.prompt_tokens ?? 0,
+        tokens_output: usage?.completion_tokens ?? 0,
+        total_tokens: usage?.total_tokens ?? 0,
+        cost_usd: cost,
+        event_count: extractedEvents.length
+      });
+
       storage.saveEvents(extractedEvents);
       setEvents(extractedEvents);
       setAppState('results');
@@ -157,6 +219,9 @@ function App() {
   const handleDownloadIcs = async () => {
     try {
       await generateIcsFile(events);
+      posthog.capture('ics_downloaded', {
+        event_count: events.length
+      });
     } catch (e) {
       console.error('Failed to generate ICS file:', e);
       setError('Failed to download calendar file.');

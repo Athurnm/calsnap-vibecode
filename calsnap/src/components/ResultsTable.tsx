@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Trash2, Copy, Plus, Calendar, ExternalLink, Pencil, X, Check, RefreshCcw } from 'lucide-react';
+import posthog from 'posthog-js';
 import { useLanguage } from '../context/LanguageContextCore';
 import type { CalendarEvent } from '../types';
 import { generateGoogleCalendarUrl } from '../lib/export';
@@ -307,6 +308,9 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({
                                                 className="p-1.5 text-gray-400 hover:text-green-600 hover:bg-green-50 active:scale-95 rounded-md transition-all"
                                                 title="Add to Google Calendar"
                                                 aria-label={`Add event ${index + 1} to Google Calendar`}
+                                                onClick={() => {
+                                                    posthog.capture('gcal_export_clicked', { source: 'desktop_row' });
+                                                }}
                                             >
                                                 <ExternalLink size={16} />
                                             </a>
@@ -361,8 +365,8 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({
                         <div
                             key={index}
                             className={`p-4 rounded-xl shadow-sm border transition-colors duration-300 space-y-3 ${isExported
-                                    ? 'bg-green-50/80 border-green-200'
-                                    : 'bg-white border-gray-100'
+                                ? 'bg-green-50/80 border-green-200'
+                                : 'bg-white border-gray-100'
                                 }`}
                         >
                             <div className="flex justify-between items-start gap-3">
@@ -429,13 +433,14 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className={`w-full py-2.5 px-4 rounded-lg font-medium flex items-center justify-center gap-2 transition-all shadow-sm ${isExported
-                                            ? 'bg-green-100 text-green-700 hover:bg-green-200'
-                                            : 'bg-green-600 text-white hover:bg-green-700 hover:shadow-md'
+                                        ? 'bg-green-100 text-green-700 hover:bg-green-200'
+                                        : 'bg-green-600 text-white hover:bg-green-700 hover:shadow-md'
                                         }`}
                                     title="Add to Google Calendar"
                                     onClick={() => {
                                         logger.info(`Exported to Google Calendar: ${event.activity}`);
                                         setExportedIndices(prev => new Set(prev).add(index));
+                                        posthog.capture('gcal_export_clicked', { source: 'mobile_card' });
                                     }}
                                 >
                                     <Calendar size={18} />
@@ -449,8 +454,8 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({
                                             logger.info(`Duplicated event: ${event.activity}`);
                                         }}
                                         className={`flex-1 py-2 px-4 rounded-lg font-medium flex items-center justify-center gap-2 transition-all border ${isExported
-                                                ? 'bg-white/60 text-gray-600 border-green-200 hover:bg-white'
-                                                : 'bg-gray-50 text-gray-600 border-gray-100 hover:bg-blue-50 hover:text-blue-600'
+                                            ? 'bg-white/60 text-gray-600 border-green-200 hover:bg-white'
+                                            : 'bg-gray-50 text-gray-600 border-gray-100 hover:bg-blue-50 hover:text-blue-600'
                                             }`}
                                         aria-label={`Duplicate event ${index + 1}`}
                                     >
@@ -460,8 +465,8 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({
                                     <button
                                         onClick={() => onDelete(index)}
                                         className={`flex-1 py-2 px-4 rounded-lg font-medium flex items-center justify-center gap-2 transition-all border ${isExported
-                                                ? 'bg-white/60 text-gray-600 border-green-200 hover:bg-red-50 hover:text-red-600'
-                                                : 'bg-gray-50 text-gray-600 border-gray-100 hover:bg-red-50 hover:text-red-600'
+                                            ? 'bg-white/60 text-gray-600 border-green-200 hover:bg-red-50 hover:text-red-600'
+                                            : 'bg-gray-50 text-gray-600 border-gray-100 hover:bg-red-50 hover:text-red-600'
                                             }`}
                                         aria-label={`Delete event ${index + 1}`}
                                     >
