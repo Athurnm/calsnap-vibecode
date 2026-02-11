@@ -9,7 +9,7 @@ import { logger } from '../lib/logger';
 
 interface ResultsTableProps {
     events: CalendarEvent[];
-    onUpdate: (index: number, field: keyof CalendarEvent, value: string | null) => void;
+    onUpdate: (index: number, updates: Partial<CalendarEvent>) => void;
     onDelete: (index: number) => void;
     onDuplicate: (index: number) => void;
     onAdd: () => void;
@@ -55,7 +55,7 @@ const DateTimeEditor: React.FC<DateTimeEditorProps> = ({ date, endDate, startTim
             >
                 <div className="flex justify-between items-center mb-4 pb-2 border-b border-gray-100">
                     <h3 className="font-semibold text-gray-900">{t('table.dateTime')}</h3>
-                    <button onClick={onCancel} className="text-gray-400 hover:text-gray-600 transition-colors">
+                    <button onClick={onCancel} className="text-gray-400 hover:text-gray-600 transition-colors" aria-label={t('table.editor.cancel')} title={t('table.editor.cancel')}>
                         <X size={18} />
                     </button>
                 </div>
@@ -186,11 +186,7 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({
     const [exportedIndices, setExportedIndices] = useState<Set<number>>(new Set());
 
     const handleDateTimeSave = (index: number, date: string, endDate: string | undefined, startTime: string | null, endTime: string | null, recurrence: 'none' | 'daily' | 'weekly' | 'monthly') => {
-        onUpdate(index, 'date', date);
-        onUpdate(index, 'endDate', endDate || null);
-        onUpdate(index, 'startTime', startTime);
-        onUpdate(index, 'endTime', endTime);
-        onUpdate(index, 'recurrence', recurrence);
+        onUpdate(index, { date, endDate, startTime, endTime, recurrence });
         setEditingDateTime(null);
         logger.info(`Updated event ${index + 1}: ${events[index].activity}`);
     };
@@ -255,7 +251,7 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({
                                         <input
                                             type="text"
                                             value={safeEvent.activity}
-                                            onChange={(e) => onUpdate(index, 'activity', e.target.value)}
+                                            onChange={(e) => onUpdate(index, { activity: e.target.value })}
                                             className="w-full bg-transparent border-none focus:ring-0 p-0 text-base font-medium text-gray-900 placeholder-gray-400"
                                             placeholder="Event Name"
                                             aria-label={`Activity for event ${index + 1}`}
@@ -302,7 +298,7 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({
                                         <input
                                             type="text"
                                             value={safeEvent.notes}
-                                            onChange={(e) => onUpdate(index, 'notes', e.target.value)}
+                                            onChange={(e) => onUpdate(index, { notes: e.target.value })}
                                             className="w-full bg-transparent border-none focus:ring-0 p-0 text-sm text-gray-600 placeholder-gray-300"
                                             placeholder="Notes..."
                                             aria-label={`Notes for event ${index + 1}`}
@@ -384,7 +380,7 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({
                                 <input
                                     type="text"
                                     value={safeEvent.activity}
-                                    onChange={(e) => onUpdate(index, 'activity', e.target.value)}
+                                    onChange={(e) => onUpdate(index, { activity: e.target.value })}
                                     className="flex-1 text-lg font-semibold text-gray-900 border-none p-0 focus:ring-0 placeholder-gray-400 bg-transparent"
                                     placeholder="Event Name"
                                     aria-label={`Activity for event ${index + 1}`}
@@ -431,7 +427,7 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({
                             <input
                                 type="text"
                                 value={safeEvent.notes}
-                                onChange={(e) => onUpdate(index, 'notes', e.target.value)}
+                                onChange={(e) => onUpdate(index, { notes: e.target.value })}
                                 className="w-full text-sm text-gray-500 border-none p-0 focus:ring-0 placeholder-gray-400 bg-transparent"
                                 placeholder="Add notes..."
                                 aria-label={`Notes for event ${index + 1}`}

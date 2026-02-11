@@ -187,9 +187,9 @@ function App() {
     setError(null);
   };
 
-  const handleUpdateEvent = (index: number, field: keyof CalendarEvent, value: string | null) => {
+  const handleUpdateEvent = (index: number, updates: Partial<CalendarEvent>) => {
     const newEvents = [...events];
-    newEvents[index] = { ...newEvents[index], [field]: value };
+    newEvents[index] = { ...newEvents[index], ...updates };
     setEvents(newEvents);
     storage.saveEvents(newEvents);
   };
