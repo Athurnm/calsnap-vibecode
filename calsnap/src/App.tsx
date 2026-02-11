@@ -40,12 +40,27 @@ function App() {
   const { canUpload, incrementUsage, usageCount, usageLimit, isPaid } = useUsage();
   const [showPaywall, setShowPaywall] = useState(false);
 
-  const [appState, setAppState] = useState<'upload' | 'processing' | 'results'>('upload');
+  const [appState, setAppState] = useState<'upload' | 'processing' | 'results'>(() => {
+    try {
+      const saved = storage.getEvents();
+      return (saved && saved.length > 0) ? 'results' : 'upload';
+    } catch {
+      return 'upload';
+    }
+  });
   const [inputMethod, setInputMethod] = useState<'image' | 'text'>('image');
   const [processingStatus, setProcessingStatus] = useState<'uploading' | 'analyzing' | 'extracting'>('analyzing');
-  const [events, setEvents] = useState<CalendarEvent[]>([]);
+  const [events, setEvents] = useState<CalendarEvent[]>(() => {
+    try {
+      const saved = storage.getEvents();
+      return saved || [];
+    } catch (e) {
+      console.error('Failed to load from storage:', e);
+      return [];
+    }
+  });
   const [error, setError] = useState<string | null>(null);
-  const [selectedModel, setSelectedModel] = useState<ModelOption>('qwen');
+  const [selectedModel, setSelectedModel] = useState<ModelOption>('google');
   const [showImportHelp, setShowImportHelp] = useState(false);
 
   useEffect(() => {
@@ -55,15 +70,7 @@ function App() {
     // Track pageview on mount
     posthog.capture('$pageview');
 
-    try {
-      const savedEvents = storage.getEvents();
-      if (savedEvents && savedEvents.length > 0) {
-        setEvents(savedEvents);
-        setAppState('results');
-      }
-    } catch (e) {
-      console.error('Failed to load from storage:', e);
-    }
+
   }, []);
 
   const handleFileSelect = (file: File) => {

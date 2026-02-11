@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import { Upload, X, FileImage, AlertCircle } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContextCore';
 
@@ -18,6 +18,15 @@ export const UploadZone: React.FC<UploadZoneProps> = ({ onFileSelect, isProcessi
     const [preview, setPreview] = useState<string | null>(null);
 
     const displayError = externalError || localError;
+
+    // Clean up object URL when component unmounts or preview changes
+    useEffect(() => {
+        return () => {
+            if (preview && preview.startsWith('blob:')) {
+                URL.revokeObjectURL(preview);
+            }
+        };
+    }, [preview]);
 
     const handleDragOver = useCallback((e: React.DragEvent) => {
         e.preventDefault();
@@ -42,11 +51,9 @@ export const UploadZone: React.FC<UploadZoneProps> = ({ onFileSelect, isProcessi
             return;
         }
 
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            setPreview(e.target?.result as string);
-        };
-        reader.readAsDataURL(file);
+        // Use createObjectURL for preview performance
+        const objectUrl = URL.createObjectURL(file);
+        setPreview(objectUrl);
 
         onFileSelect(file);
     }, [onFileSelect, t]);

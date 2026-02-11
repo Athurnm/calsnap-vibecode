@@ -14,7 +14,6 @@
     "date-fns": "^4.1.0",
     "ical-generator": "^10.0.0",
     "lucide-react": "^0.563.0",
-    "openai": "^6.18.0",
     "posthog-js": "^1.342.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
